@@ -1,70 +1,66 @@
-/**
- * Пакет содержит REST-контроллеры для обработки HTTP-запросов,
- * связанных с управлением банковскими счетами.
- */
 package com.bank.controller;
-
 
 import com.bank.model.Account;
 import com.bank.service.BankService;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+
 
 /**
- * Контроллер для работы с банковскими счетами.
+ * Controller for handling bank account operations.
  */
 @RestController
 @RequestMapping("api/accounts")
 public final class BankController {
 
-    /**
-     * Сервис для работы с аккаунтами.
-     */
-    private final BankService bankService;
+  /**
+   * Service for handling bank account logic.
+   */
+  private final BankService bankService;
 
-    /**
-     * Конструктор BankController.
-     *
-     * @param service сервис для работы с аккаунтами
-     */
-    public BankController(final BankService service) {
-        this.bankService = service;
-    }
+  /**
+   * Constructor for BankController.
+   *
+   * @param service service for handling bank accounts
+   */
+  public BankController(final BankService service) {
+    this.bankService = service;
+  }
 
-    /**
-     * Получить список всех аккаунтов.
-     *
-     * @return список аккаунтов
-     */
-    @GetMapping
-    public List<Account> findAllAccounts() {
-        return bankService.findAllAccounts();
-    }
+  /**
+   * Retrieve a list of all accounts.
+   *
+   * @return list of accounts
+   */
+  @GetMapping
+  public List<Account> findAllAccounts() {
+    return bankService.findAllAccounts();
+  }
 
-    /**
-     * Получить аккаунт по имени владельца.
-     *
-     * @param ownerName имя владельца
-     * @return аккаунт владельца
-     */
-    @GetMapping("/by-owner")
-    public Account getAccountByOwnerName(@RequestParam final String ownerName) {
-        return bankService.getAccountByOwnerName(ownerName);
-    }
+  /**
+   * Retrieve an account by owner name.
+   *
+   * @param ownerName owner's name
+   * @return account of the owner
+   */
+  @GetMapping("/by-owner")
+  public Account getAccountByOwnerName(@RequestParam final String ownerName) {
+    return bankService.getAccountByOwnerName(ownerName);
+  }
 
-    /**
-     * Получить аккаунт по ID.
-     *
-     * @param accountId идентификатор аккаунта
-     * @return аккаунт
-     */
-    @GetMapping("/{accountId}")
-    public Account getAccountById(@PathVariable final int accountId) {
-        return bankService.getAccountById(accountId);
-    }
+  /**
+   * Retrieve an account by ID.
+   *
+   * @param accountId account identifier
+   * @return account
+   */
+  @GetMapping("/{accountId}")
+  public Account getAccountById(@PathVariable final int accountId) {
+    return bankService.getAccountById(accountId);
+  }
 }

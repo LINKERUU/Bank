@@ -4,23 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * Represents a bank account with an ID, owner name, and balance.
+ */
 @Builder
 @Getter
 @AllArgsConstructor
 public class Account {
 
-    /**
-     * Уникальный идентификатор счета.
-     */
-    private int accountId;
+  /**
+   * Unique account identifier.
+   */
+  private int accountId;
 
-    /**
-     * Имя владельца счета.
-     */
-    private String ownerName;
+  /**
+   * Name of the account owner.
+   */
+  private String ownerName;
 
-    /**
-     * Баланс счета.
-     */
-    private double balance;
+  /**
+   * Account balance.
+   */
+  private double balance;
 }

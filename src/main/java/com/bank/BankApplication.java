@@ -19,11 +19,5 @@ public class BankApplication {
     SpringApplication.run(BankApplication.class, args);
   }
 
-  /**
-   * Dummy method to bypass Checkstyle validation.
-   * This method does not perform any functionality.
-   */
-  public void dummyMethod() {
-    // Dummy method for Checkstyle validation
   }
 }

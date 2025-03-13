@@ -17,13 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  * Controller for managing bank transactions.
  */
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
+
+  private static final String TRANSACTION_TYPE_CREDIT = "credit";
+  private static final String TRANSACTION_TYPE_DEBIT = "debit";
 
   private final TransactionService transactionService;
   private final CardRepository cardRepository;
@@ -35,7 +37,7 @@ public class TransactionController {
    * @param cardRepository     the card repository to be used
    */
   public TransactionController(TransactionService transactionService,
-      CardRepository cardRepository) {
+                               CardRepository cardRepository) {
     this.transactionService = transactionService;
     this.cardRepository = cardRepository;
   }
@@ -60,7 +62,7 @@ public class TransactionController {
   @GetMapping("/{id}")
   public Transaction findTransactionById(@PathVariable Long id) {
     return transactionService.findTransactionById(id)
-    .orElseThrow(() -> new ResourceNotFoundException("Not found transaction with ID" + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found transaction with ID " + id));
   }
 
   /**
@@ -80,7 +82,7 @@ public class TransactionController {
 
     String transactionType = transaction.getTransactionType().toLowerCase();
 
-    if (!"credit".equals(transactionType) && !"debit".equals(transactionType)) {
+    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType) && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
       throw new IllegalArgumentException("Неизвестный тип транзакции: "
               + transaction.getTransactionType());
     }
@@ -107,7 +109,7 @@ public class TransactionController {
   public Transaction updateTransaction(@PathVariable Long id,
                                        @RequestBody Transaction transaction) {
     if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Not found transaction with ID" + id);
+      throw new ResourceNotFoundException("Not found transaction with ID " + id);
     }
     return transactionService.updateTransaction(id, transaction);
   }
@@ -138,12 +140,12 @@ public class TransactionController {
     double amount = transaction.getAmount();
     String transactionType = transaction.getTransactionType().toLowerCase();
 
-    if (!"credit".equals(transactionType) && !"debit".equals(transactionType)) {
+    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType) && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
       throw new IllegalArgumentException("Неизвестный тип транзакции: "
               + transaction.getTransactionType());
     }
 
-    if ("credit".equals(transactionType)) {
+    if (TRANSACTION_TYPE_CREDIT.equals(transactionType)) {
       card.setBalance(card.getBalance() + amount);
     } else {
       card.setBalance(card.getBalance() - amount);

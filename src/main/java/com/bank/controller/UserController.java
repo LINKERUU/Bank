@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  * Controller for managing user-related operations.
  */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+  private static final String USER_NOT_FOUND_MESSAGE = "Not found User with id: ";
 
   private final UserService userService;
 
@@ -54,8 +55,7 @@ public class UserController {
   @GetMapping("/{id}")
   public User findUserById(@PathVariable Long id) {
     return userService.findUserById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
-                    + id + " не найден"));
+            .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
   }
 
   /**
@@ -93,7 +93,7 @@ public class UserController {
   @PutMapping("/{id}")
   public User updateUser(@PathVariable Long id, @RequestBody User user) {
     if (userService.findUserById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден");
+      throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id);
     }
     return userService.updateUser(id, user);
   }
@@ -108,7 +108,7 @@ public class UserController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUser(@PathVariable Long id) {
     if (userService.findUserById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден");
+      throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id);
     }
     userService.deleteUser(id);
   }

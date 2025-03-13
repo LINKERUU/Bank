@@ -14,13 +14,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
  * Implementation of the {@link UserService} interface for managing users.
  * Provides methods for retrieving, creating, updating, and deleting users.
  */
 @Service
 public class UserServiceImpl implements UserService {
+
+  private static final String USER_NOT_FOUND_MESSAGE = "Not found User with id: ";
 
   private final UserRepository userRepository;
   private final PasswordService passwordService;
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public User updateUser(Long id, User user) {
     User existingUser = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Not found User with id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
     existingUser.setFirstName(user.getFirstName());
     existingUser.setLastName(user.getLastName());
@@ -86,8 +87,8 @@ public class UserServiceImpl implements UserService {
     if (user.getAccounts() != null) {
       Set<Account> updatedAccounts = user.getAccounts().stream()
               .map(account -> accountRepository.findById(account.getId())
-                      .orElseThrow(() -> new ResourceNotFoundException(
-                              "Not found User with id: " + id)))
+                      .orElseThrow(() -> new
+                              ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id)))
               .collect(Collectors.toSet());
 
       existingUser.setAccounts(updatedAccounts); // Set the existing accounts
@@ -100,7 +101,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void deleteUser(Long id) {
     if (!userRepository.existsById(id)) {
-      throw new ResourceNotFoundException("Not found User with id: " + id);
+      throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id);
     }
     userRepository.deleteById(id);
   }

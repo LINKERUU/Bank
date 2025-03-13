@@ -71,8 +71,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public User updateUser(Long id, User user) {
     User existingUser = userRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
-                    + id + " не найден"));
+            .orElseThrow(() -> new ResourceNotFoundException("Not found User with id: " + id));
 
     existingUser.setFirstName(user.getFirstName());
     existingUser.setLastName(user.getLastName());
@@ -87,8 +86,8 @@ public class UserServiceImpl implements UserService {
     if (user.getAccounts() != null) {
       Set<Account> updatedAccounts = user.getAccounts().stream()
               .map(account -> accountRepository.findById(account.getId())
-                      .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID "
-                              + account.getId() + " не найден")))
+                      .orElseThrow(() -> new ResourceNotFoundException(
+                              "Not found User with id: " + id)))
               .collect(Collectors.toSet());
 
       existingUser.setAccounts(updatedAccounts); // Set the existing accounts
@@ -101,7 +100,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void deleteUser(Long id) {
     if (!userRepository.existsById(id)) {
-      throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден");
+      throw new ResourceNotFoundException("Not found User with id: " + id);
     }
     userRepository.deleteById(id);
   }

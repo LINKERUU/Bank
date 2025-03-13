@@ -26,6 +26,7 @@ public class TransactionController {
 
   private static final String TRANSACTION_TYPE_CREDIT = "credit";
   private static final String TRANSACTION_TYPE_DEBIT = "debit";
+  private static final String TRANSACTION_NOT_FOUND_MESSAGE = "Not found transaction with ID ";
 
   private final TransactionService transactionService;
   private final CardRepository cardRepository;
@@ -62,7 +63,7 @@ public class TransactionController {
   @GetMapping("/{id}")
   public Transaction findTransactionById(@PathVariable Long id) {
     return transactionService.findTransactionById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Not found transaction with ID " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id));
   }
 
   /**
@@ -82,7 +83,8 @@ public class TransactionController {
 
     String transactionType = transaction.getTransactionType().toLowerCase();
 
-    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType) && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
+    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
+            && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
       throw new IllegalArgumentException("Неизвестный тип транзакции: "
               + transaction.getTransactionType());
     }
@@ -109,7 +111,7 @@ public class TransactionController {
   public Transaction updateTransaction(@PathVariable Long id,
                                        @RequestBody Transaction transaction) {
     if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Not found transaction with ID " + id);
+      throw new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id);
     }
     return transactionService.updateTransaction(id, transaction);
   }
@@ -124,7 +126,7 @@ public class TransactionController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTransaction(@PathVariable Long id) {
     if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Not found transaction with ID " + id);
+      throw new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id);
     }
     transactionService.deleteTransaction(id);
   }
@@ -140,7 +142,8 @@ public class TransactionController {
     double amount = transaction.getAmount();
     String transactionType = transaction.getTransactionType().toLowerCase();
 
-    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType) && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
+    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
+            && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
       throw new IllegalArgumentException("Неизвестный тип транзакции: "
               + transaction.getTransactionType());
     }

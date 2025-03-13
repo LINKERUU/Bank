@@ -60,7 +60,7 @@ public class TransactionController {
   @GetMapping("/{id}")
   public Transaction findTransactionById(@PathVariable Long id) {
     return transactionService.findTransactionById(id)
-    .orElseThrow(() -> new ResourceNotFoundException("Транзакция с ID " + id + " не найдена"));
+    .orElseThrow(() -> new ResourceNotFoundException("Not found transaction with ID" + id));
   }
 
   /**
@@ -107,7 +107,7 @@ public class TransactionController {
   public Transaction updateTransaction(@PathVariable Long id,
                                        @RequestBody Transaction transaction) {
     if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Транзакция с ID " + id + " не найдена");
+      throw new ResourceNotFoundException("Not found transaction with ID" + id);
     }
     return transactionService.updateTransaction(id, transaction);
   }
@@ -122,7 +122,7 @@ public class TransactionController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTransaction(@PathVariable Long id) {
     if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException("Транзакция с ID " + id + " не найдена");
+      throw new ResourceNotFoundException("Not found transaction with ID " + id);
     }
     transactionService.deleteTransaction(id);
   }

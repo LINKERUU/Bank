@@ -43,13 +43,12 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public Account createAccount(Account account) {
-    // Проверяем, что пользователь привязан к аккаунту
+
     if (account.getUsers() == null || account.getUsers().isEmpty()) {
       throw new IllegalArgumentException(
               "Аккаунт должен быть привязан хотя бы к одному пользователю.");
     }
 
-    // Сохраняем аккаунт
     return accountRepository.save(account);
   }
 
@@ -62,27 +61,23 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public void deleteAccount(Long id) {
-    // Находим аккаунт по ID
+
     Account account = accountRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
 
-    // Удаляем все связанные карты
     if (account.getCards() != null && !account.getCards().isEmpty()) {
       cardRepository.deleteAll(account.getCards());
     }
 
-    // Удаляем сам аккаунт
     accountRepository.delete(account);
   }
 
   @Override
   @Transactional
   public Account updateAccount(Long id, Account updatedAccount) {
-    // Находим существующий аккаунт по ID
     Account existingAccount = accountRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
 
-    // Обновляем только те поля, которые были переданы в запросе
     if (updatedAccount.getAccountNumber() != null) {
       existingAccount.setAccountNumber(updatedAccount.getAccountNumber());
     }
@@ -90,9 +85,6 @@ public class AccountServiceImpl implements AccountService {
       existingAccount.setBalance(updatedAccount.getBalance());
     }
 
-    // Не обновляем поле users, чтобы сохранить существующие связи
-
-    // Сохраняем обновлённый аккаунт
     return accountRepository.save(existingAccount);
   }
 

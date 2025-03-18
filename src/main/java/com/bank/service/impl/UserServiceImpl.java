@@ -69,11 +69,11 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User updateUser(Long id, User updatedUser) {
-    // Находим существующего пользователя по ID
+
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
-    // Обновляем только те поля, которые были переданы в запросе
+
     if (updatedUser.getFirstName() != null) {
       existingUser.setFirstName(updatedUser.getFirstName());
     }
@@ -90,9 +90,6 @@ public class UserServiceImpl implements UserService {
       existingUser.setPasswordHash(passwordService.hashPassword(updatedUser.getPasswordHash()));
     }
 
-    // Не обновляем поле accounts, чтобы сохранить существующие связи
-
-    // Сохраняем обновлённого пользователя
     return userRepository.save(existingUser);
   }
 
@@ -103,16 +100,15 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
                     + userId + " не найден."));
 
-    // Удаляем пользователя из всех связанных аккаунтов
+
     for (Account account : user.getAccounts()) {
       account.getUsers().remove(user);
       if (account.getUsers().isEmpty()) {
-        // Если у аккаунта больше нет пользователей, удаляем его
+
         accountRepository.delete(account);
       }
     }
 
-    // Удаляем самого пользователя
     userRepository.delete(user);
   }
 }

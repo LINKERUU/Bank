@@ -65,7 +65,7 @@ public class CardServiceImpl implements CardService {
     Card existingCard = cardRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Card not found with ID: " + id));
 
-    // Обновляем только те поля, которые переданы в DTO
+
     if (card.getCardNumber() != null) {
       existingCard.setCardNumber(card.getCardNumber());
     }
@@ -76,7 +76,7 @@ public class CardServiceImpl implements CardService {
       existingCard.setCvv(card.getCvv());
     }
 
-    // Поле user не обновляется, остается прежним
+
     return cardRepository.save(existingCard);
   }
 

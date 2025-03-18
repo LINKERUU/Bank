@@ -1,5 +1,6 @@
 package com.bank.service.impl;
 
+import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.Card;
 import com.bank.repository.CardRepository;
 import com.bank.service.CardService;
@@ -19,7 +20,9 @@ public class CardServiceImpl implements CardService {
   private final CardRepository cardRepository;
 
   /**
-   * Constructor.
+   * Constructor for dependency injection.
+   *
+   * @param cardRepository the repository for managing card entities
    */
   @Autowired
   public CardServiceImpl(CardRepository cardRepository) {
@@ -54,13 +57,13 @@ public class CardServiceImpl implements CardService {
    * @param id   the ID of the card to update
    * @param card the updated card details
    * @return the updated card
-   * @throws RuntimeException if the card with the specified ID is not found
+   * @throws ResourceNotFoundException if the card with the specified ID is not found
    */
   @Override
   @Transactional
   public Card updateCard(Long id, Card card) {
     Card existingCard = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Card not found with ID: " + id));
 
     // Обновляем только те поля, которые переданы в DTO
     if (card.getCardNumber() != null) {
@@ -72,9 +75,6 @@ public class CardServiceImpl implements CardService {
     if (card.getCvv() != null) {
       existingCard.setCvv(card.getCvv());
     }
-    if (card.getBalance() != null) {
-      existingCard.setBalance(card.getBalance());
-    }
 
     // Поле user не обновляется, остается прежним
     return cardRepository.save(existingCard);
@@ -83,6 +83,9 @@ public class CardServiceImpl implements CardService {
   @Override
   @Transactional
   public void deleteCard(Long id) {
+    if (!cardRepository.existsById(id)) {
+      throw new ResourceNotFoundException("Card not found with ID: " + id);
+    }
     cardRepository.deleteById(id);
   }
 }

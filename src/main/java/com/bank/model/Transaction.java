@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-
 /**
  * Represents a transaction entity in the banking system.
  */
@@ -48,10 +47,12 @@ public class Transaction {
   private LocalDateTime transactionDate = LocalDateTime.now();
 
   @JsonBackReference
-  @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-  @JoinColumn(name = "card_id", nullable = false)
-  private Card card;
+  @ManyToOne(
+          fetch = FetchType.LAZY,
+          cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+  @JoinColumn(name = "account_id", nullable = false)
+  private Account account;
 
   @Transient
-  private Long cardId;
+  private Long accountId;
 }

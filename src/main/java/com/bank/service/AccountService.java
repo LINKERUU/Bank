@@ -3,6 +3,8 @@ package com.bank.service;
 import com.bank.model.Account;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * Service interface for managing {@link Account} entities.
@@ -43,7 +45,7 @@ public interface AccountService {
   /**
    * Updates an existing account.
    *
-   * @param id      the ID of the account to update
+   * @param id the ID of the account to update
    * @param account the updated account details
    * @return the updated account
    */
@@ -55,6 +57,14 @@ public interface AccountService {
    * @param id the ID of the account to delete
    */
   void deleteAccount(Long id);
+
+  /**
+   * Deletes a card by its ID.
+   *
+   * @param id the ID of the card to delete
+   */
+  @Transactional
+  void deleteCard(Long id);
 
   /**
    * Retrieves an account by its account number.

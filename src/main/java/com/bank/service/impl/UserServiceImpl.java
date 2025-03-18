@@ -9,8 +9,6 @@ import com.bank.service.PasswordService;
 import com.bank.service.UserService;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,39 +68,51 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public User updateUser(Long id, User user) {
+  public User updateUser(Long id, User updatedUser) {
+    // Находим существующего пользователя по ID
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
-    existingUser.setFirstName(user.getFirstName());
-    existingUser.setLastName(user.getLastName());
-    existingUser.setEmail(user.getEmail());
-    existingUser.setPhone(user.getPhone());
-
-    if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {
-      existingUser.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
+    // Обновляем только те поля, которые были переданы в запросе
+    if (updatedUser.getFirstName() != null) {
+      existingUser.setFirstName(updatedUser.getFirstName());
+    }
+    if (updatedUser.getLastName() != null) {
+      existingUser.setLastName(updatedUser.getLastName());
+    }
+    if (updatedUser.getEmail() != null) {
+      existingUser.setEmail(updatedUser.getEmail());
+    }
+    if (updatedUser.getPhone() != null) {
+      existingUser.setPhone(updatedUser.getPhone());
+    }
+    if (updatedUser.getPasswordHash() != null && !updatedUser.getPasswordHash().isEmpty()) {
+      existingUser.setPasswordHash(passwordService.hashPassword(updatedUser.getPasswordHash()));
     }
 
-    // If account IDs are provided, load them from the database
-    if (user.getAccounts() != null) {
-      Set<Account> updatedAccounts = user.getAccounts().stream()
-              .map(account -> accountRepository.findById(account.getId())
-                      .orElseThrow(() -> new
-                              ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id)))
-              .collect(Collectors.toSet());
+    // Не обновляем поле accounts, чтобы сохранить существующие связи
 
-      existingUser.setAccounts(updatedAccounts); // Set the existing accounts
-    }
-
+    // Сохраняем обновлённого пользователя
     return userRepository.save(existingUser);
   }
 
   @Override
   @Transactional
-  public void deleteUser(Long id) {
-    if (!userRepository.existsById(id)) {
-      throw new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id);
+  public void deleteUser(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
+                    + userId + " не найден."));
+
+    // Удаляем пользователя из всех связанных аккаунтов
+    for (Account account : user.getAccounts()) {
+      account.getUsers().remove(user);
+      if (account.getUsers().isEmpty()) {
+        // Если у аккаунта больше нет пользователей, удаляем его
+        accountRepository.delete(account);
+      }
     }
-    userRepository.deleteById(id);
+
+    // Удаляем самого пользователя
+    userRepository.delete(user);
   }
 }

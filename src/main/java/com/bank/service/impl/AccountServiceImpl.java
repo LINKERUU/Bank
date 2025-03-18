@@ -2,8 +2,9 @@ package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.Account;
-import com.bank.model.User;
+import com.bank.model.Card;
 import com.bank.repository.AccountRepository;
+import com.bank.repository.CardRepository;
 import com.bank.service.AccountService;
 import java.util.List;
 import java.util.Optional;
@@ -18,13 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class AccountServiceImpl implements AccountService {
 
   private final AccountRepository accountRepository;
+  private final CardRepository cardRepository;
 
   /**
    * Constructor.
    */
   @Autowired
-  public AccountServiceImpl(AccountRepository accountRepository) {
+  public AccountServiceImpl(AccountRepository accountRepository, CardRepository cardRepository) {
     this.accountRepository = accountRepository;
+    this.cardRepository = cardRepository;
   }
 
   @Override
@@ -40,6 +43,13 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public Account createAccount(Account account) {
+    // Проверяем, что пользователь привязан к аккаунту
+    if (account.getUsers() == null || account.getUsers().isEmpty()) {
+      throw new IllegalArgumentException(
+              "Аккаунт должен быть привязан хотя бы к одному пользователю.");
+    }
+
+    // Сохраняем аккаунт
     return accountRepository.save(account);
   }
 
@@ -51,26 +61,61 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   @Transactional
-  public Account updateAccount(Long id, Account account) {
-    account.setId(id); // Убедимся, что ID обновляемого счета совпадает с переданным ID
-    return accountRepository.save(account);
+  public void deleteAccount(Long id) {
+    // Находим аккаунт по ID
+    Account account = accountRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
+
+    // Удаляем все связанные карты
+    if (account.getCards() != null && !account.getCards().isEmpty()) {
+      cardRepository.deleteAll(account.getCards());
+    }
+
+    // Удаляем сам аккаунт
+    accountRepository.delete(account);
   }
 
   @Override
   @Transactional
-  public void deleteAccount(Long id) {
-    Account account = accountRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Не найден аккаунт с id: " + id));
+  public Account updateAccount(Long id, Account updatedAccount) {
+    // Находим существующий аккаунт по ID
+    Account existingAccount = accountRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
 
-    // Удаляем связи с пользователями
-    for (User user : account.getUsers()) {
-      user.getAccounts().remove(account); // Удаляем аккаунт из списка пользователя
+    // Обновляем только те поля, которые были переданы в запросе
+    if (updatedAccount.getAccountNumber() != null) {
+      existingAccount.setAccountNumber(updatedAccount.getAccountNumber());
     }
-    account.getUsers().clear(); // Очищаем список пользователей у аккаунта
+    if (updatedAccount.getBalance() != null) {
+      existingAccount.setBalance(updatedAccount.getBalance());
+    }
 
-    // Удаляем аккаунт
-    accountRepository.delete(account);
+    // Не обновляем поле users, чтобы сохранить существующие связи
+
+    // Сохраняем обновлённый аккаунт
+    return accountRepository.save(existingAccount);
   }
+
+
+
+
+  @Override
+  @Transactional
+  public void deleteCard(Long id) {
+    Card card = cardRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Не найдена карта с id: " + id));
+
+    // Удаляем карту из списка карт аккаунта
+    Account account = card.getAccount();
+    if (account != null) {
+      account.getCards().remove(card);
+    }
+
+    // Удаляем саму карту
+    cardRepository.delete(card);
+  }
+
+
 
   @Override
   public Optional<Account> findByAccountNumber(String accountNumber) {

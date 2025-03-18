@@ -1,9 +1,9 @@
 package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
-import com.bank.model.Card;
+import com.bank.model.Account;
 import com.bank.model.Transaction;
-import com.bank.repository.CardRepository;
+import com.bank.repository.AccountRepository;
 import com.bank.service.TransactionService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+
 /**
  * Controller for managing bank transactions.
  */
@@ -29,18 +30,18 @@ public class TransactionController {
   private static final String TRANSACTION_NOT_FOUND_MESSAGE = "Not found transaction with ID ";
 
   private final TransactionService transactionService;
-  private final CardRepository cardRepository;
+  private final AccountRepository accountRepository;
 
   /**
    * Constructs a new TransactionController with the specified services.
    *
    * @param transactionService the transaction service to be used
-   * @param cardRepository     the card repository to be used
+   * @param accountRepository  the account repository to be used
    */
   public TransactionController(TransactionService transactionService,
-                               CardRepository cardRepository) {
+                               AccountRepository accountRepository) {
     this.transactionService = transactionService;
-    this.cardRepository = cardRepository;
+    this.accountRepository = accountRepository;
   }
 
   /**
@@ -56,7 +57,7 @@ public class TransactionController {
   /**
    * Retrieves a transaction by its ID.
    *
-   * @param id the ID of the transaction to retrieve
+   * @param id the ID of the transaction
    * @return the transaction with the specified ID
    * @throws ResourceNotFoundException if the transaction is not found
    */
@@ -71,14 +72,14 @@ public class TransactionController {
    *
    * @param transaction the transaction to create
    * @return the created transaction
-   * @throws IllegalArgumentException if the card ID is null or the transaction type is invalid
-   * @throws ResourceNotFoundException if the card is not found
+   * @throws IllegalArgumentException if the account ID is null or the transaction type is invalid
+   * @throws ResourceNotFoundException if the account is not found
    */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Transaction createTransaction(@RequestBody Transaction transaction) {
-    if (transaction.getCardId() == null) {
-      throw new IllegalArgumentException("Card ID cannot be null");
+    if (transaction.getAccountId() == null) {
+      throw new IllegalArgumentException("Account ID cannot be null");
     }
 
     String transactionType = transaction.getTransactionType().toLowerCase();
@@ -89,20 +90,22 @@ public class TransactionController {
               + transaction.getTransactionType());
     }
 
-    Card card = cardRepository.findById(transaction.getCardId())
-            .orElseThrow(() -> new ResourceNotFoundException("Карта с ID "
-                    + transaction.getCardId() + " не найдена"));
+    Account account = accountRepository.findById(transaction.getAccountId())
+            .orElseThrow(() -> new ResourceNotFoundException("Учётная запись с ID "
+                    + transaction.getAccountId() + " не найдена"));
 
-    transaction.setCard(card);
-    updateCardBalance(card, transaction);
-    cardRepository.save(card);
+    updateBalances(account, transaction);
+
+    accountRepository.save(account);
+
+    transaction.setAccount(account);
     return transactionService.createTransaction(transaction);
   }
 
   /**
    * Updates an existing transaction.
    *
-   * @param id          the ID of the transaction to update
+   * @param id the ID of the transaction to update
    * @param transaction the updated transaction details
    * @return the updated transaction
    * @throws ResourceNotFoundException if the transaction is not found
@@ -132,13 +135,13 @@ public class TransactionController {
   }
 
   /**
-   * Updates the balance of a card based on the transaction.
+   * Updates the account balance based on the transaction type.
    *
-   * @param card        the card to update
+   * @param account the account to update
    * @param transaction the transaction to apply
-   * @throws IllegalArgumentException if the transaction type is invalid
+   * @throws IllegalArgumentException if the transaction type is invalid or insufficient funds
    */
-  private void updateCardBalance(Card card, Transaction transaction) {
+  private void updateBalances(Account account, Transaction transaction) {
     double amount = transaction.getAmount();
     String transactionType = transaction.getTransactionType().toLowerCase();
 
@@ -148,12 +151,13 @@ public class TransactionController {
               + transaction.getTransactionType());
     }
 
-    if (TRANSACTION_TYPE_CREDIT.equals(transactionType)) {
-      card.setBalance(card.getBalance() + amount);
+    if (TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
+      account.setBalance(account.getBalance() + amount);
     } else {
-      card.setBalance(card.getBalance() - amount);
+      if (account.getBalance() < amount) {
+        throw new IllegalArgumentException("Недостаточно средств на счете!");
+      }
+      account.setBalance(account.getBalance() - amount);
     }
-
-    cardRepository.save(card);
   }
 }

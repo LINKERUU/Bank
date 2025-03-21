@@ -3,7 +3,6 @@ package com.bank.service;
 import com.bank.model.Account;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.transaction.annotation.Transactional;
 
 
 /**

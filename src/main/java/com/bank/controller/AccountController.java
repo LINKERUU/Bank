@@ -1,11 +1,9 @@
 package com.bank.controller;
 
 import com.bank.model.Account;
-import com.bank.repository.AccountRepository;
 import com.bank.service.AccountService;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,8 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-  @Autowired
-  private AccountRepository accountRepository;
   private final AccountService accountService;
 
   /**

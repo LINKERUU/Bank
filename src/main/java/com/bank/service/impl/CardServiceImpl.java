@@ -4,6 +4,7 @@ import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.Card;
 import com.bank.repository.CardRepository;
 import com.bank.service.CardService;
+import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +19,48 @@ import org.springframework.transaction.annotation.Transactional;
 public class CardServiceImpl implements CardService {
 
   private final CardRepository cardRepository;
+  private final InMemoryCache<String, List<Card>> cardCache;
+  private final InMemoryCache<Long, Card> cardByIdCache;
 
   /**
-   * Constructor for dependency injection.
+   * Constructs a new CardServiceImpl with the specified repository and caches.
    *
-   * @param cardRepository the repository for managing card entities
+   * @param cardRepository the repository for managing cards
+   * @param cardCache the cache for storing lists of cards
+   * @param cardByIdCache the cache for storing cards by their ID
    */
   @Autowired
-  public CardServiceImpl(CardRepository cardRepository) {
+  public CardServiceImpl(CardRepository cardRepository,
+                         InMemoryCache<String, List<Card>> cardCache,
+                         InMemoryCache<Long, Card> cardByIdCache) {
     this.cardRepository = cardRepository;
+    this.cardCache = cardCache;
+    this.cardByIdCache = cardByIdCache;
   }
 
   @Override
   public List<Card> findAllCards() {
-    return cardRepository.findAll();
+    String cacheKey = "all_cards";
+    List<Card> cachedCards = cardCache.get(cacheKey);
+    if (cachedCards != null) {
+      return cachedCards;
+    }
+
+    List<Card> cards = cardRepository.findAll();
+    cardCache.put(cacheKey, cards);
+    return cards;
   }
 
   @Override
   public Optional<Card> findCardById(Long id) {
-    return cardRepository.findById(id);
+    Card cachedCard = cardByIdCache.get(id);
+    if (cachedCard != null) {
+      return Optional.of(cachedCard);
+    }
+
+    Optional<Card> card = cardRepository.findById(id);
+    card.ifPresent(c -> cardByIdCache.put(id, c));
+    return card;
   }
 
   @Override
@@ -87,5 +111,9 @@ public class CardServiceImpl implements CardService {
       throw new ResourceNotFoundException("Card not found with ID: " + id);
     }
     cardRepository.deleteById(id);
+
+    // Очищаем кэш
+    cardByIdCache.evict(id);
+    cardCache.clear();
   }
 }

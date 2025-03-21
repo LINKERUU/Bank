@@ -2,10 +2,10 @@ package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.Account;
-import com.bank.model.Card;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
 import com.bank.service.AccountService;
+import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +20,63 @@ public class AccountServiceImpl implements AccountService {
 
   private final AccountRepository accountRepository;
   private final CardRepository cardRepository;
+  private final InMemoryCache<String, List<Account>> accountCache; // Кэш для списка аккаунтов
+  private final InMemoryCache<Long, Account> accountByIdCache; // Кэш для аккаунта по ID
 
   /**
-   * Constructor.
+   * Constructs a new AccountServiceImpl with the specified repositories and caches.
+   *
+   * @param accountRepository the repository for managing accounts
+   * @param cardRepository the repository for managing cards
+   * @param accountCache the cache for storing lists of accounts
+   * @param accountByIdCache the cache for storing accounts by their ID
    */
   @Autowired
-  public AccountServiceImpl(AccountRepository accountRepository, CardRepository cardRepository) {
+  public AccountServiceImpl(AccountRepository accountRepository,
+                            CardRepository cardRepository,
+                            InMemoryCache<String, List<Account>> accountCache,
+                            InMemoryCache<Long, Account> accountByIdCache) {
     this.accountRepository = accountRepository;
     this.cardRepository = cardRepository;
+    this.accountCache = accountCache;
+    this.accountByIdCache = accountByIdCache;
+  }
+
+  @Override
+  public List<Account> findByUserEmail(String email) {
+    List<Account> cachedAccounts = accountCache.get(email);
+    if (cachedAccounts != null) {
+      return cachedAccounts;
+    }
+
+    List<Account> accounts = accountRepository.findByUserEmail(email);
+    accountCache.put(email, accounts);
+    return accounts;
   }
 
   @Override
   public List<Account> findAllAccounts() {
-    return accountRepository.findAll();
+    String cacheKey = "all_accounts";
+    List<Account> cachedAccounts = accountCache.get(cacheKey);
+    if (cachedAccounts != null) {
+      return cachedAccounts;
+    }
+
+    List<Account> accounts = accountRepository.findAll();
+    accountCache.put(cacheKey, accounts);
+    return accounts;
   }
 
   @Override
   public Optional<Account> findAccountById(Long id) {
-    return accountRepository.findById(id);
+    Account cachedAccount = accountByIdCache.get(id);
+    if (cachedAccount != null) {
+      return Optional.of(cachedAccount);
+    }
+
+    Optional<Account> account = accountRepository.findById(id);
+    account.ifPresent(acc -> accountByIdCache.put(id, acc));
+    return account;
   }
 
   @Override
@@ -61,7 +100,6 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public void deleteAccount(Long id) {
-
     Account account = accountRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
 
@@ -70,6 +108,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     accountRepository.delete(account);
+
+    accountCache.clear();
+    accountByIdCache.evict(id);
   }
 
   @Override
@@ -85,32 +126,9 @@ public class AccountServiceImpl implements AccountService {
       existingAccount.setBalance(updatedAccount.getBalance());
     }
 
+    accountByIdCache.put(id, existingAccount);
+    accountCache.clear();
+
     return accountRepository.save(existingAccount);
-  }
-
-
-
-
-  @Override
-  @Transactional
-  public void deleteCard(Long id) {
-    Card card = cardRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Не найдена карта с id: " + id));
-
-    // Удаляем карту из списка карт аккаунта
-    Account account = card.getAccount();
-    if (account != null) {
-      account.getCards().remove(card);
-    }
-
-    // Удаляем саму карту
-    cardRepository.delete(card);
-  }
-
-
-
-  @Override
-  public Optional<Account> findByAccountNumber(String accountNumber) {
-    return accountRepository.findByAccountNumber(accountNumber);
   }
 }

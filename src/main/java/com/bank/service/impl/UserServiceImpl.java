@@ -7,8 +7,10 @@ import com.bank.repository.AccountRepository;
 import com.bank.repository.UserRepository;
 import com.bank.service.PasswordService;
 import com.bank.service.UserService;
+import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,29 +26,53 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PasswordService passwordService;
   private final AccountRepository accountRepository;
+  private final InMemoryCache<String, List<User>> userCache; // Кэш для списка пользователей
+  private final InMemoryCache<Long, User> userByIdCache; // Кэш для пользователя по ID
 
   /**
-   * Constructs a new UserServiceImpl with the specified repositories and services.
+   * Constructor for UserServiceImpl.
    *
-   * @param userRepository the repository for managing users
-   * @param passwordService the service for password hashing
-   * @param accountRepository the repository for managing accounts
+   * @param userRepository the user repository
+   * @param passwordService the password hashing service
+   * @param accountRepository the account repository
+   * @param userCache cache for user lists
+   * @param userByIdCache cache for users by ID
    */
+  @Autowired
   public UserServiceImpl(UserRepository userRepository, PasswordService passwordService,
-                         AccountRepository accountRepository) {
+                         AccountRepository accountRepository,
+                         InMemoryCache<String, List<User>> userCache,
+                         InMemoryCache<Long, User> userByIdCache) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
     this.accountRepository = accountRepository;
+    this.userCache = userCache;
+    this.userByIdCache = userByIdCache;
   }
 
   @Override
   public List<User> findAllUsers() {
-    return userRepository.findAll();
+    String cacheKey = "all_users";
+    List<User> cachedUsers = userCache.get(cacheKey);
+    if (cachedUsers != null) {
+      return cachedUsers;
+    }
+
+    List<User> users = userRepository.findAll();
+    userCache.put(cacheKey, users);
+    return users;
   }
 
   @Override
   public Optional<User> findUserById(Long id) {
-    return userRepository.findById(id);
+    User cachedUser = userByIdCache.get(id);
+    if (cachedUser != null) {
+      return Optional.of(cachedUser);
+    }
+
+    Optional<User> user = userRepository.findById(id);
+    user.ifPresent(u -> userByIdCache.put(id, u));
+    return user;
   }
 
   @Override
@@ -100,15 +126,16 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
                     + userId + " не найден."));
 
-
     for (Account account : user.getAccounts()) {
       account.getUsers().remove(user);
       if (account.getUsers().isEmpty()) {
-
         accountRepository.delete(account);
       }
     }
 
     userRepository.delete(user);
+
+    userByIdCache.evict(userId);
+    userCache.clear();
   }
 }

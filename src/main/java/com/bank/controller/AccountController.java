@@ -1,10 +1,13 @@
 package com.bank.controller;
 
 import com.bank.model.Account;
+import com.bank.repository.AccountRepository;
 import com.bank.service.AccountService;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
+  @Autowired
+  private AccountRepository accountRepository;
   private final AccountService accountService;
 
   /**
@@ -103,13 +108,15 @@ public class AccountController {
   }
 
   /**
-   * Retrieves an account by its account number.
+   * Retrieves accounts associated with a specific user email.
    *
-   * @param accountNumber the account number to search for
-   * @return the account with the specified account number, if found
+   * @param email the email of the user to filter accounts by
+   * @return a list of accounts associated with the specified email
    */
-  @GetMapping("/by-account-number")
-  public Optional<Account> findAccountByAccountNumber(@RequestParam String accountNumber) {
-    return accountService.findByAccountNumber(accountNumber);
+  @GetMapping("/filterByUserEmail")
+  public ResponseEntity<List<Account>> getAccountsByUserEmail(@RequestParam String email) {
+    List<Account> accounts = accountService.findByUserEmail(email);
+    return ResponseEntity.ok(accounts);
   }
+
 }

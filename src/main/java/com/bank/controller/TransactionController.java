@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
  * Controller for managing bank transactions.
  */
@@ -86,13 +85,13 @@ public class TransactionController {
 
     if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
             && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
-      throw new IllegalArgumentException("Неизвестный тип транзакции: "
+      throw new IllegalArgumentException("Unknown transaction type: "
               + transaction.getTransactionType());
     }
 
     Account account = accountRepository.findById(transaction.getAccountId())
-            .orElseThrow(() -> new ResourceNotFoundException("Учётная запись с ID "
-                    + transaction.getAccountId() + " не найдена"));
+            .orElseThrow(() -> new ResourceNotFoundException("Account with ID "
+                    + transaction.getAccountId() + " not found"));
 
     updateBalances(account, transaction);
 
@@ -147,17 +146,22 @@ public class TransactionController {
 
     if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
             && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
-      throw new IllegalArgumentException("Неизвестный тип транзакции: "
+      throw new IllegalArgumentException("Unknown transaction type: "
               + transaction.getTransactionType());
     }
 
     if (TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
       account.setBalance(account.getBalance() + amount);
     } else {
-      if (account.getBalance() < amount) {
-        throw new IllegalArgumentException("Недостаточно средств на счете!");
+      if (account.getBalance() - amount < 0) {
+        throw new IllegalArgumentException("Insufficient funds in the account!");
       }
       account.setBalance(account.getBalance() - amount);
+    }
+
+    // Ensure balance does not become negative
+    if (account.getBalance() < 0) {
+      throw new IllegalArgumentException("Account balance cannot be negative!");
     }
   }
 }

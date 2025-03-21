@@ -18,6 +18,15 @@ public interface AccountService {
    */
   List<Account> findAllAccounts();
 
+
+  /**
+   * Retrieves accounts associated with a specific user email.
+   *
+   * @param email the email of the user to filter accounts by
+   * @return a list of accounts associated with the specified email
+   */
+  List<Account> findByUserEmail(String email);
+
   /**
    * Retrieves an account by its ID.
    *
@@ -58,19 +67,4 @@ public interface AccountService {
    */
   void deleteAccount(Long id);
 
-  /**
-   * Deletes a card by its ID.
-   *
-   * @param id the ID of the card to delete
-   */
-  @Transactional
-  void deleteCard(Long id);
-
-  /**
-   * Retrieves an account by its account number.
-   *
-   * @param accountNumber the account number to search for
-   * @return an {@link Optional} containing the account if found, otherwise empty
-   */
-  Optional<Account> findByAccountNumber(String accountNumber);
 }

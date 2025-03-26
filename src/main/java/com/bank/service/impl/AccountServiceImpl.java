@@ -13,88 +13,79 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link AccountService} interface for managing {@link Account} entities.
+ * Implementation of {@link AccountService} that provides business logic
+ * for managing bank accounts with caching support.
  */
 @Service
 public class AccountServiceImpl implements AccountService {
 
   private final AccountRepository accountRepository;
   private final CardRepository cardRepository;
-  private final InMemoryCache<String, List<Account>> accountCache; // Кэш для списка аккаунтов
-  private final InMemoryCache<Long, Account> accountByIdCache; // Кэш для аккаунта по ID
+  private final InMemoryCache<Long, Account> accountCache;
 
   /**
-   * Constructs a new AccountServiceImpl with the specified repositories and caches.
+   * Constructs an AccountServiceImpl with required dependencies.
    *
-   * @param accountRepository the repository for managing accounts
-   * @param cardRepository the repository for managing cards
-   * @param accountCache the cache for storing lists of accounts
-   * @param accountByIdCache the cache for storing accounts by their ID
+   * @param accountRepository the account repository
+   * @param cardRepository the card repository
+   * @param accountCache the in-memory cache for accounts
    */
   @Autowired
   public AccountServiceImpl(AccountRepository accountRepository,
                             CardRepository cardRepository,
-                            InMemoryCache<String, List<Account>> accountCache,
-                            InMemoryCache<Long, Account> accountByIdCache) {
+                            InMemoryCache<Long, Account> accountCache) {
     this.accountRepository = accountRepository;
     this.cardRepository = cardRepository;
     this.accountCache = accountCache;
-    this.accountByIdCache = accountByIdCache;
   }
 
   @Override
   public List<Account> findByUserEmail(String email) {
-    List<Account> cachedAccounts = accountCache.get(email);
-    if (cachedAccounts != null) {
-      return cachedAccounts;
-    }
+    return accountRepository.findByUserEmail(email);
+  }
 
-    List<Account> accounts = accountRepository.findByUserEmail(email);
-    accountCache.put(email, accounts);
-    return accounts;
+  @Override
+  public  List<Account> findAccountsWithCards() {
+    return accountRepository.findAccountsWithCards();
   }
 
   @Override
   public List<Account> findAllAccounts() {
-    String cacheKey = "all_accounts";
-    List<Account> cachedAccounts = accountCache.get(cacheKey);
-    if (cachedAccounts != null) {
-      return cachedAccounts;
-    }
-
-    List<Account> accounts = accountRepository.findAll();
-    accountCache.put(cacheKey, accounts);
-    return accounts;
+    // Не кэшируем список, так как он часто меняется
+    return accountRepository.findAll();
   }
 
   @Override
   public Optional<Account> findAccountById(Long id) {
-    Account cachedAccount = accountByIdCache.get(id);
+    Account cachedAccount = accountCache.get(id);
     if (cachedAccount != null) {
       return Optional.of(cachedAccount);
     }
 
     Optional<Account> account = accountRepository.findById(id);
-    account.ifPresent(acc -> accountByIdCache.put(id, acc));
+    account.ifPresent(acc -> accountCache.put(id, acc));
     return account;
   }
 
   @Override
   @Transactional
   public Account createAccount(Account account) {
-
     if (account.getUsers() == null || account.getUsers().isEmpty()) {
-      throw new IllegalArgumentException(
-              "Аккаунт должен быть привязан хотя бы к одному пользователю.");
+      throw new IllegalArgumentException("Аккаунт должен "
+              + "быть привязан хотя бы к одному пользователю.");
     }
 
-    return accountRepository.save(account);
+    Account savedAccount = accountRepository.save(account);
+    accountCache.put(savedAccount.getId(), savedAccount);
+    return savedAccount;
   }
 
   @Override
   @Transactional
   public List<Account> createAccounts(List<Account> accounts) {
-    return accountRepository.saveAll(accounts);
+    List<Account> savedAccounts = accountRepository.saveAll(accounts);
+    savedAccounts.forEach(acc -> accountCache.put(acc.getId(), acc));
+    return savedAccounts;
   }
 
   @Override
@@ -108,9 +99,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     accountRepository.delete(account);
-
-    accountCache.clear();
-    accountByIdCache.evict(id);
+    accountCache.evict(id);
   }
 
   @Override
@@ -126,9 +115,8 @@ public class AccountServiceImpl implements AccountService {
       existingAccount.setBalance(updatedAccount.getBalance());
     }
 
-    accountByIdCache.put(id, existingAccount);
-    accountCache.clear();
-
-    return accountRepository.save(existingAccount);
+    Account savedAccount = accountRepository.save(existingAccount);
+    accountCache.put(id, savedAccount);
+    return savedAccount;
   }
 }

@@ -8,25 +8,30 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository interface for managing {@link Account} entities.
+ * Repository for managing bank accounts.
+ * Provides methods to access and manipulate account data.
  */
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
   /**
-   * Finds accounts associated with a specific user email.
+   * Finds all accounts associated with a user by email.
    *
-   * @param email the email of the user to filter accounts by
-   * @return a list of accounts associated with the specified email
+   * @param email the user's email address
+   * @return list of accounts associated with the given email
    */
-  @Query("SELECT a FROM Account a JOIN a.users u WHERE u.email = :email")
+  @Query(value = "SELECT DISTINCT a.* FROM accounts a "
+          + "JOIN user_accounts ua ON a.id = ua.account_id "
+          + "JOIN users u ON ua.user_id = u.id "
+          + "WHERE u.email = :email",
+          nativeQuery = true)
   List<Account> findByUserEmail(@Param("email") String email);
 
-  //  @Query(
-  //          value = "SELECT DISTINCT a.* FROM accounts a " +
-  //                  "JOIN user_accounts ua ON a.id = ua.account_id " +
-  //                  "JOIN users u ON ua.user_id = u.id " +
-  //                  "WHERE u.email = :email",
-  //          nativeQuery = true
-  //  )
+  /**
+   * Finds all accounts that have at least one card associated.
+   *
+   * @return list of accounts with cards
+   */
+  @Query("SELECT a FROM Account a WHERE a.cards IS NOT EMPTY")
+  List<Account> findAccountsWithCards();
 }

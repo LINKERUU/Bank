@@ -15,117 +15,99 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Implementation of the {@link UserService} interface for managing users.
- * Provides methods for retrieving, creating, updating, and deleting users.
+ * Service implementation for user management operations.
+ * Provides CRUD functionality for users with password hashing and caching support.
+ * Manages user-account relationships and ensures data consistency.
  */
 @Service
 public class UserServiceImpl implements UserService {
 
-  private static final String USER_NOT_FOUND_MESSAGE = "Not found User with id: ";
+  private static final String USER_NOT_FOUND_MESSAGE = "User not found with id: ";
 
   private final UserRepository userRepository;
   private final PasswordService passwordService;
   private final AccountRepository accountRepository;
-  private final InMemoryCache<String, List<User>> userCache; // Кэш для списка пользователей
-  private final InMemoryCache<Long, User> userByIdCache; // Кэш для пользователя по ID
+  private final InMemoryCache<Long, User> userCache;
 
   /**
-   * Constructor for UserServiceImpl.
+   * Constructs a UserServiceImpl with required dependencies.
    *
-   * @param userRepository the user repository
-   * @param passwordService the password hashing service
-   * @param accountRepository the account repository
-   * @param userCache cache for user lists
-   * @param userByIdCache cache for users by ID
+   * @param userRepository repository for user data access
+   * @param passwordService service for password hashing operations
+   * @param accountRepository repository for account data access
+   * @param userCache in-memory cache for user entities
    */
   @Autowired
-  public UserServiceImpl(UserRepository userRepository, PasswordService passwordService,
+  public UserServiceImpl(UserRepository userRepository,
+                         PasswordService passwordService,
                          AccountRepository accountRepository,
-                         InMemoryCache<String, List<User>> userCache,
-                         InMemoryCache<Long, User> userByIdCache) {
+                         InMemoryCache<Long, User> userCache) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
     this.accountRepository = accountRepository;
     this.userCache = userCache;
-    this.userByIdCache = userByIdCache;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> findAllUsers() {
-    String cacheKey = "all_users";
-    List<User> cachedUsers = userCache.get(cacheKey);
-    if (cachedUsers != null) {
-      return cachedUsers;
-    }
-
-    List<User> users = userRepository.findAll();
-    userCache.put(cacheKey, users);
-    return users;
+    // Не кэшируем список пользователей
+    return userRepository.findAll();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<User> findUserById(Long id) {
-    User cachedUser = userByIdCache.get(id);
+    User cachedUser = userCache.get(id);
     if (cachedUser != null) {
       return Optional.of(cachedUser);
     }
 
     Optional<User> user = userRepository.findById(id);
-    user.ifPresent(u -> userByIdCache.put(id, u));
+    user.ifPresent(u -> userCache.put(id, u));
     return user;
   }
 
   @Override
   @Transactional
   public User createUser(User user) {
-    // Hash the password before saving
-    String hashedPassword = passwordService.hashPassword(user.getPasswordHash());
-    user.setPasswordHash(hashedPassword);
-    return userRepository.save(user);
+    user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
+    User savedUser = userRepository.save(user);
+    userCache.put(savedUser.getId(), savedUser);
+    return savedUser;
   }
 
   @Override
   @Transactional
   public List<User> createUsers(List<User> users) {
-    users.forEach(user -> user.setPasswordHash(
-            passwordService.hashPassword(user.getPasswordHash())));
-    return userRepository.saveAll(users);
+    users.forEach(user ->
+            user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()))
+    );
+    List<User> savedUsers = userRepository.saveAll(users);
+    savedUsers.forEach(user -> userCache.put(user.getId(), user));
+    return savedUsers;
   }
 
   @Override
   @Transactional
   public User updateUser(Long id, User updatedUser) {
-
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
+    updateUserFields(existingUser, updatedUser);
 
-    if (updatedUser.getFirstName() != null) {
-      existingUser.setFirstName(updatedUser.getFirstName());
-    }
-    if (updatedUser.getLastName() != null) {
-      existingUser.setLastName(updatedUser.getLastName());
-    }
-    if (updatedUser.getEmail() != null) {
-      existingUser.setEmail(updatedUser.getEmail());
-    }
-    if (updatedUser.getPhone() != null) {
-      existingUser.setPhone(updatedUser.getPhone());
-    }
-    if (updatedUser.getPasswordHash() != null && !updatedUser.getPasswordHash().isEmpty()) {
-      existingUser.setPasswordHash(passwordService.hashPassword(updatedUser.getPasswordHash()));
-    }
-
-    return userRepository.save(existingUser);
+    User savedUser = userRepository.save(existingUser);
+    userCache.put(id, savedUser);
+    return savedUser;
   }
 
   @Override
   @Transactional
   public void deleteUser(Long userId) {
     User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("Пользователь с ID "
-                    + userId + " не найден."));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
+    // Удаляем пользователя из связанных аккаунтов
     for (Account account : user.getAccounts()) {
       account.getUsers().remove(user);
       if (account.getUsers().isEmpty()) {
@@ -134,8 +116,24 @@ public class UserServiceImpl implements UserService {
     }
 
     userRepository.delete(user);
+    userCache.evict(userId);
+  }
 
-    userByIdCache.evict(userId);
-    userCache.clear();
+  private void updateUserFields(User existing, User updated) {
+    if (updated.getFirstName() != null) {
+      existing.setFirstName(updated.getFirstName());
+    }
+    if (updated.getLastName() != null) {
+      existing.setLastName(updated.getLastName());
+    }
+    if (updated.getEmail() != null) {
+      existing.setEmail(updated.getEmail());
+    }
+    if (updated.getPhone() != null) {
+      existing.setPhone(updated.getPhone());
+    }
+    if (updated.getPasswordHash() != null && !updated.getPasswordHash().isEmpty()) {
+      existing.setPasswordHash(passwordService.hashPassword(updated.getPasswordHash()));
+    }
   }
 }

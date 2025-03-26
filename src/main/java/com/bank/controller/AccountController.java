@@ -109,10 +109,14 @@ public class AccountController {
    * @param email the email of the user to filter accounts by
    * @return a list of accounts associated with the specified email
    */
-  @GetMapping("/filterByUserEmail")
+  @GetMapping("/by-email")
   public ResponseEntity<List<Account>> getAccountsByUserEmail(@RequestParam String email) {
-    List<Account> accounts = accountService.findByUserEmail(email);
-    return ResponseEntity.ok(accounts);
+    return ResponseEntity.ok(accountService.findByUserEmail(email));
+  }
+
+  @GetMapping("/with-cards")
+  public ResponseEntity<List<Account>> getAccountsWithCards() {
+    return ResponseEntity.ok(accountService.findAccountsWithCards());
   }
 
 }

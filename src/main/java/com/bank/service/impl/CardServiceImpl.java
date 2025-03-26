@@ -13,82 +13,70 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * Implementation of the {@link CardService} interface for managing {@link Card} entities.
+ * Implementation of {@link CardService} that provides business logic
+ * for managing bank cards with caching support.
+ * Handles CRUD operations for cards while maintaining cache consistency.
  */
 @Service
 public class CardServiceImpl implements CardService {
 
   private final CardRepository cardRepository;
-  private final InMemoryCache<String, List<Card>> cardCache;
-  private final InMemoryCache<Long, Card> cardByIdCache;
+  private final InMemoryCache<Long, Card> cardCache;
 
   /**
-   * Constructs a new CardServiceImpl with the specified repository and caches.
+   * Constructs a CardServiceImpl with required dependencies.
    *
-   * @param cardRepository the repository for managing cards
-   * @param cardCache the cache for storing lists of cards
-   * @param cardByIdCache the cache for storing cards by their ID
+   * @param cardRepository the repository for card data access
+   * @param cardCache the in-memory cache for card entities
    */
   @Autowired
   public CardServiceImpl(CardRepository cardRepository,
-                         InMemoryCache<String, List<Card>> cardCache,
-                         InMemoryCache<Long, Card> cardByIdCache) {
+                         InMemoryCache<Long, Card> cardCache) {
     this.cardRepository = cardRepository;
     this.cardCache = cardCache;
-    this.cardByIdCache = cardByIdCache;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Card> findAllCards() {
-    String cacheKey = "all_cards";
-    List<Card> cachedCards = cardCache.get(cacheKey);
-    if (cachedCards != null) {
-      return cachedCards;
-    }
-
-    List<Card> cards = cardRepository.findAll();
-    cardCache.put(cacheKey, cards);
-    return cards;
+    // Не кэшируем список карт, так как он часто меняется
+    return cardRepository.findAll();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<Card> findCardById(Long id) {
-    Card cachedCard = cardByIdCache.get(id);
+    Card cachedCard = cardCache.get(id);
     if (cachedCard != null) {
       return Optional.of(cachedCard);
     }
 
     Optional<Card> card = cardRepository.findById(id);
-    card.ifPresent(c -> cardByIdCache.put(id, c));
+    card.ifPresent(c -> cardCache.put(id, c));
     return card;
   }
 
   @Override
   @Transactional
   public Card createCard(Card card) {
-    return cardRepository.save(card);
+    Card savedCard = cardRepository.save(card);
+    cardCache.put(savedCard.getId(), savedCard);
+    return savedCard;
   }
 
   @Override
   @Transactional
   public List<Card> createCards(List<Card> cards) {
-    return cardRepository.saveAll(cards);
+    List<Card> savedCards = cardRepository.saveAll(cards);
+    savedCards.forEach(c -> cardCache.put(c.getId(), c));
+    return savedCards;
   }
 
-  /**
-   * Updates an existing card.
-   *
-   * @param id   the ID of the card to update
-   * @param card the updated card details
-   * @return the updated card
-   * @throws ResourceNotFoundException if the card with the specified ID is not found
-   */
   @Override
   @Transactional
   public Card updateCard(Long id, Card card) {
     Card existingCard = cardRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Card not found with ID: " + id));
-
 
     if (card.getCardNumber() != null) {
       existingCard.setCardNumber(card.getCardNumber());
@@ -100,8 +88,9 @@ public class CardServiceImpl implements CardService {
       existingCard.setCvv(card.getCvv());
     }
 
-
-    return cardRepository.save(existingCard);
+    Card savedCard = cardRepository.save(existingCard);
+    cardCache.put(id, savedCard);
+    return savedCard;
   }
 
   @Override
@@ -111,9 +100,6 @@ public class CardServiceImpl implements CardService {
       throw new ResourceNotFoundException("Card not found with ID: " + id);
     }
     cardRepository.deleteById(id);
-
-    // Очищаем кэш
-    cardByIdCache.evict(id);
-    cardCache.clear();
+    cardCache.evict(id);
   }
 }

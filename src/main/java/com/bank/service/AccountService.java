@@ -24,7 +24,15 @@ public interface AccountService {
    * @param email the email of the user to filter accounts by
    * @return a list of accounts associated with the specified email
    */
+
+
   List<Account> findByUserEmail(String email);
+
+  /**
+   * Find accounts with cards.
+   *
+   */
+  List<Account> findAccountsWithCards();
 
   /**
    * Retrieves an account by its ID.

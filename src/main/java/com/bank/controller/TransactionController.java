@@ -5,6 +5,9 @@ import com.bank.model.Account;
 import com.bank.model.Transaction;
 import com.bank.repository.AccountRepository;
 import com.bank.service.TransactionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,6 +51,8 @@ public class TransactionController {
    *
    * @return a list of all transactions
    */
+  @Operation(summary = "Получить все транзакции", description = "Возвращает список всех транзакций")
+  @ApiResponse(responseCode = "200", description = "Транзакции успешно получены")
   @GetMapping
   public List<Transaction> findAllTransactions() {
     return transactionService.findAllTransactions();
@@ -60,6 +65,12 @@ public class TransactionController {
    * @return the transaction with the specified ID
    * @throws ResourceNotFoundException if the transaction is not found
    */
+  @Operation(summary = "Получить транзакцию по ID",
+          description = "Возвращает транзакцию по ее идентификатору")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Транзакция найдена"),
+      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+  })
   @GetMapping("/{id}")
   public Transaction findTransactionById(@PathVariable Long id) {
     return transactionService.findTransactionById(id)
@@ -74,6 +85,14 @@ public class TransactionController {
    * @throws IllegalArgumentException if the account ID is null or the transaction type is invalid
    * @throws ResourceNotFoundException if the account is not found
    */
+  @Operation(summary = "Создать новую транзакцию",
+          description = "Создает новую транзакцию (кредит или дебет)")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "201", description = "Транзакция успешно создана"),
+      @ApiResponse(responseCode = "400", description = "Неверные входные данные"),
+      @ApiResponse(responseCode = "404", description = "Счет не найден"),
+      @ApiResponse(responseCode = "409", description = "Недостаточно средств")
+  })
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Transaction createTransaction(@RequestBody Transaction transaction) {
@@ -109,6 +128,11 @@ public class TransactionController {
    * @return the updated transaction
    * @throws ResourceNotFoundException if the transaction is not found
    */
+  @Operation(summary = "Обновить транзакцию", description = "Обновляет существующую транзакцию")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Транзакция успешно обновлена"),
+      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+  })
   @PutMapping("/{id}")
   public Transaction updateTransaction(@PathVariable Long id,
                                        @RequestBody Transaction transaction) {
@@ -124,6 +148,11 @@ public class TransactionController {
    * @param id the ID of the transaction to delete
    * @throws ResourceNotFoundException if the transaction is not found
    */
+  @Operation(summary = "Удалить транзакцию", description = "Удаляет транзакцию по ее ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "Транзакция успешно удалена"),
+      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+  })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTransaction(@PathVariable Long id) {

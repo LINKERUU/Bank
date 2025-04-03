@@ -2,6 +2,9 @@ package com.bank.controller;
 
 import com.bank.model.Card;
 import com.bank.service.CardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -39,6 +42,9 @@ public class CardController {
    *
    * @return a list of all cards
    */
+  @Operation(summary = "Получить все карты",
+          description = "Возвращает список всех банковских карт")
+  @ApiResponse(responseCode = "200", description = "Карты успешно получены")
   @GetMapping
   public List<Card> findAllCards() {
     return cardService.findAllCards();
@@ -50,6 +56,12 @@ public class CardController {
    * @param id the ID of the card to retrieve
    * @return an {@link Optional} containing the card if found, otherwise empty
    */
+  @Operation(summary = "Получить карту по ID",
+          description = "Возвращает карту по ее идентификатору")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Карта найдена"),
+      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+  })
   @GetMapping("/{id}")
   public Optional<Card> findCardById(@PathVariable Long id) {
     return cardService.findCardById(id);
@@ -61,6 +73,9 @@ public class CardController {
    * @param card the card to create
    * @return the created card
    */
+  @Operation(summary = "Создать новую карту",
+          description = "Создает новую банковскую карту")
+  @ApiResponse(responseCode = "201", description = "Карта успешно создана")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public Card createCard(@RequestBody Card card) {
@@ -73,6 +88,9 @@ public class CardController {
    * @param cards the list of cards to create
    * @return the list of created cards
    */
+  @Operation(summary = "Массовое создание карт",
+          description = "Создает несколько карт одновременно")
+  @ApiResponse(responseCode = "201", description = "Карты успешно созданы")
   @PostMapping("/batch")
   @ResponseStatus(HttpStatus.CREATED)
   public List<Card> createCards(@RequestBody List<Card> cards) {
@@ -86,6 +104,11 @@ public class CardController {
    * @param card the updated card details
    * @return the updated card
    */
+  @Operation(summary = "Обновить карту", description = "Обновляет существующую карту")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Карта успешно обновлена"),
+      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+  })
   @PutMapping("/{id}")
   public Card updateCard(@PathVariable Long id, @RequestBody Card card) {
     return cardService.updateCard(id, card);
@@ -96,6 +119,11 @@ public class CardController {
    *
    * @param id the ID of the card to delete
    */
+  @Operation(summary = "Удалить карту", description = "Удаляет карту по ее ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "Карта успешно удалена"),
+      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+  })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteCard(@PathVariable Long id) {

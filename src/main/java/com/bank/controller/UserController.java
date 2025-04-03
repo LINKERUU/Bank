@@ -3,6 +3,9 @@ package com.bank.controller;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.User;
 import com.bank.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,6 +43,9 @@ public class UserController {
    *
    * @return a list of all users
    */
+  @Operation(summary = "Получить всех пользователей",
+          description = "Возвращает список всех пользователей")
+  @ApiResponse(responseCode = "200", description = "Пользователи успешно получены")
   @GetMapping
   public List<User> findAllUsers() {
     return userService.findAllUsers();
@@ -52,6 +58,12 @@ public class UserController {
    * @return the user with the specified ID
    * @throws ResourceNotFoundException if the user is not found
    */
+  @Operation(summary = "Получить пользователя по ID",
+          description = "Возвращает пользователя по его идентификатору")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Пользователь найден"),
+      @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+  })
   @GetMapping("/{id}")
   public User findUserById(@PathVariable Long id) {
     return userService.findUserById(id)
@@ -64,6 +76,8 @@ public class UserController {
    * @param user the user to create
    * @return the created user
    */
+  @Operation(summary = "Создать нового пользователя", description = "Создает нового пользователя")
+  @ApiResponse(responseCode = "201", description = "Пользователь успешно создан")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public User createUser(@RequestBody User user) {
@@ -76,6 +90,9 @@ public class UserController {
    * @param users the list of users to create
    * @return the list of created users
    */
+  @Operation(summary = "Массовое создание пользователей",
+          description = "Создает несколько пользователей одновременно")
+  @ApiResponse(responseCode = "201", description = "Пользователи успешно созданы")
   @PostMapping("/batch")
   @ResponseStatus(HttpStatus.CREATED)
   public List<User> createUsers(@RequestBody List<User> users) {
@@ -90,6 +107,12 @@ public class UserController {
    * @return the updated user
    * @throws ResourceNotFoundException if the user is not found
    */
+  @Operation(summary = "Обновить пользователя",
+          description = "Обновляет существующего пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "Пользователь успешно обновлен"),
+      @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+  })
   @PutMapping("/{id}")
   public User updateUser(@PathVariable Long id, @RequestBody User user) {
     if (userService.findUserById(id).isEmpty()) {
@@ -104,6 +127,11 @@ public class UserController {
    * @param id the ID of the user to delete
    * @throws ResourceNotFoundException if the user is not found
    */
+  @Operation(summary = "Удалить пользователя", description = "Удаляет пользователя по его ID")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "Пользователь успешно удален"),
+      @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+  })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteUser(@PathVariable Long id) {

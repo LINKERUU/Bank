@@ -5,12 +5,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.core.io.Resource;
@@ -77,12 +79,21 @@ public class LogController {
       return ResponseEntity.notFound().build();
     }
 
-    // Create temp file for download
-    Path tempLogFile = Files.createTempFile("logs-" + dateStr, ".log");
-    Files.write(tempLogFile, filteredLogs.getBytes());
+    // Create temp file for download with safe naming
+    Path tempLogFile;
+    try {
+      // Generate random filename prefix instead of using user input
+      String randomPrefix = "bank-logs-" + UUID.randomUUID().toString();
+      tempLogFile = Files.createTempFile(randomPrefix, ".log");
+
+      // Write filtered logs to the temp file
+      Files.writeString(tempLogFile, filteredLogs);
+    } catch (IOException e) {
+      return ResponseEntity.internalServerError().build();
+    }
 
     Resource resource = new UrlResource(tempLogFile.toUri());
-    tempLogFile.toFile().deleteOnExit(); // Удалить после завершения работы JVM
+    tempLogFile.toFile().deleteOnExit();
 
     return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION,

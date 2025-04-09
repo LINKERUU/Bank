@@ -97,7 +97,7 @@ public class TransactionController {
       @ApiResponse(responseCode = "409", description = "Insufficient funds")
   })
   @PostMapping
-  public ResponseEntity<?> createTransaction(@Valid @RequestBody Transaction transaction) {
+  public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody Transaction transaction) {
     try {
       if (transaction.getTransactionType() != null) {
         transaction.setTransactionType(transaction.getTransactionType().toLowerCase());
@@ -105,11 +105,11 @@ public class TransactionController {
       Transaction created = transactionService.createTransaction(transaction);
       return ResponseEntity.status(HttpStatus.CREATED).body(created);
     } catch (ValidationException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     } catch (ResourceNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
     } catch (Exception e) {
-      return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
+      throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
   }
 

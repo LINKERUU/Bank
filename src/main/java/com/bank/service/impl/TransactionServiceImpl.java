@@ -1,6 +1,7 @@
 package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
+import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.model.Transaction;
 import com.bank.repository.AccountRepository;
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service implementation for managing financial transactions.
- * Provides methods for creating, reading, updating, and deleting transactions
- * while maintaining account balance consistency.
+ * Implementation of the TransactionService interface.
+ * Provides business logic for transaction operations including
+ * creation, retrieval, updating and deletion of transactions.
  */
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -27,7 +28,7 @@ public class TransactionServiceImpl implements TransactionService {
   private final AccountRepository accountRepository;
 
   /**
-   * Constructs a TransactionServiceImpl with required repositories.
+   * Constructs a new TransactionServiceImpl with required repositories.
    *
    * @param transactionRepository repository for transaction data access
    * @param accountRepository repository for account data access
@@ -46,27 +47,38 @@ public class TransactionServiceImpl implements TransactionService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<Transaction> findTransactionById(Long id) {
+    if (id == null || id <= 0) {
+      throw new ValidationException("Invalid transaction ID");
+    }
     return transactionRepository.findById(id);
   }
 
   @Override
   @Transactional
   public Transaction createTransaction(Transaction transaction) {
-    Account account = accountRepository.findById(transaction.getAccountId())
-            .orElseThrow(() -> new ResourceNotFoundException("Account not found with ID: "
-                    + transaction.getAccountId()));
+    validateTransaction(transaction);
 
-    transaction.setAccount(account);
+    Account account = accountRepository.findById(transaction.getAccountId())
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Account not found with ID: " + transaction.getAccountId()));
+
+    processTransaction(transaction, account);
+
+    accountRepository.save(account);
     return transactionRepository.save(transaction);
   }
 
   @Override
   @Transactional
   public Transaction updateTransaction(Long id, Transaction updatedTransaction) {
+    validateTransactionId(id);
+    validateTransaction(updatedTransaction);
+
     Transaction existing = transactionRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: "
-                    + id));
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Transaction not found with ID: " + id));
 
     updateAccountBalance(existing, updatedTransaction);
     updateTransactionFields(existing, updatedTransaction);
@@ -77,12 +89,53 @@ public class TransactionServiceImpl implements TransactionService {
   @Override
   @Transactional
   public void deleteTransaction(Long id) {
+    validateTransactionId(id);
+
     Transaction transaction = transactionRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: "
-                    + id));
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Transaction not found with ID: " + id));
 
     revertAccountBalance(transaction);
     transactionRepository.deleteById(id);
+  }
+
+  private void validateTransactionId(Long id) {
+    if (id == null || id <= 0) {
+      throw new ValidationException("Invalid transaction ID");
+    }
+  }
+
+  private void validateTransaction(Transaction transaction) {
+    if (transaction == null) {
+      throw new ValidationException("Transaction cannot be null");
+    }
+
+    if (transaction.getAmount() == null || transaction.getAmount() <= 0) {
+      throw new ValidationException("Transaction amount must be positive");
+    }
+
+    if (transaction.getTransactionType() == null
+            || !(TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transaction.getTransactionType())
+            || TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(transaction.getTransactionType()))) {
+      throw new ValidationException("Transaction type must be 'credit' or 'debit'");
+    }
+
+    if (transaction.getAccountId() == null) {
+      throw new ValidationException("Account ID cannot be null");
+    }
+  }
+
+  private void processTransaction(Transaction transaction, Account account) {
+    if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transaction.getTransactionType())) {
+
+      account.setBalance(account.getBalance() + transaction.getAmount());
+    } else {
+      if (account.getBalance() < transaction.getAmount()) {
+        throw new ValidationException("Insufficient funds for debit transaction");
+      }
+      account.setBalance(account.getBalance() - transaction.getAmount());
+    }
+    transaction.setAccount(account);
   }
 
   private void updateAccountBalance(Transaction existing, Transaction updated) {
@@ -90,20 +143,20 @@ public class TransactionServiceImpl implements TransactionService {
 
     // Revert existing transaction effect
     if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(existing.getTransactionType())) {
-      account.setBalance(account.getBalance() + existing.getAmount());
-    } else if (TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(existing.getTransactionType())) {
       account.setBalance(account.getBalance() - existing.getAmount());
+    } else {
+      account.setBalance(account.getBalance() + existing.getAmount());
     }
 
     // Apply new transaction effect
     if (updated.getAmount() != null && updated.getTransactionType() != null) {
       if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(updated.getTransactionType())) {
+        account.setBalance(account.getBalance() + updated.getAmount());
+      } else {
         if (account.getBalance() < updated.getAmount()) {
-          throw new IllegalArgumentException("Insufficient funds");
+          throw new ValidationException("Insufficient funds for debit transaction");
         }
         account.setBalance(account.getBalance() - updated.getAmount());
-      } else if (TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(updated.getTransactionType())) {
-        account.setBalance(account.getBalance() + updated.getAmount());
       }
     }
 
@@ -132,11 +185,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     if (TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(transaction.getTransactionType())) {
       if (account.getBalance() < transaction.getAmount()) {
-        throw new IllegalArgumentException("Cannot revert transaction - insufficient funds");
+        throw new ValidationException("Cannot revert transaction - insufficient funds");
       }
-      account.setBalance(account.getBalance() - transaction.getAmount());
-    } else if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transaction.getTransactionType())) {
       account.setBalance(account.getBalance() + transaction.getAmount());
+    } else {
+      account.setBalance(account.getBalance() - transaction.getAmount());
     }
 
     accountRepository.save(account);

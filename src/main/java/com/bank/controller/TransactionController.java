@@ -1,15 +1,16 @@
 package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
-import com.bank.model.Account;
+import com.bank.exception.ValidationException;
 import com.bank.model.Transaction;
-import com.bank.repository.AccountRepository;
 import com.bank.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,178 +20,144 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Controller for managing bank transactions.
+ * Provides CRUD operations for transactions including creation,
+ * retrieval, updating and deletion.
  */
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
-  private static final String TRANSACTION_TYPE_CREDIT = "credit";
-  private static final String TRANSACTION_TYPE_DEBIT = "debit";
-  private static final String TRANSACTION_NOT_FOUND_MESSAGE = "Not found transaction with ID ";
-
   private final TransactionService transactionService;
-  private final AccountRepository accountRepository;
 
   /**
-   * Constructs a new TransactionController with the specified services.
+   * Constructs a new TransactionController.
    *
-   * @param transactionService the transaction service to be used
-   * @param accountRepository  the account repository to be used
+   * @param transactionService service for transaction operations
    */
-  public TransactionController(TransactionService transactionService,
-                               AccountRepository accountRepository) {
+  public TransactionController(TransactionService transactionService) {
     this.transactionService = transactionService;
-    this.accountRepository = accountRepository;
   }
 
   /**
    * Retrieves all transactions.
    *
-   * @return a list of all transactions
+   * @return ResponseEntity containing list of all transactions
    */
-  @Operation(summary = "Получить все транзакции", description = "Возвращает список всех транзакций")
-  @ApiResponse(responseCode = "200", description = "Транзакции успешно получены")
+  @Operation(summary = "Get all transactions",
+          description = "Returns a list of all bank transactions")
+  @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
   @GetMapping
-  public List<Transaction> findAllTransactions() {
-    return transactionService.findAllTransactions();
+  public ResponseEntity<List<Transaction>> getAllTransactions() {
+    return ResponseEntity.ok(transactionService.findAllTransactions());
   }
 
   /**
    * Retrieves a transaction by its ID.
    *
-   * @param id the ID of the transaction
-   * @return the transaction with the specified ID
-   * @throws ResourceNotFoundException if the transaction is not found
+   * @param id the ID of the transaction to retrieve
+   * @return ResponseEntity containing the found transaction
+   * @throws ResponseStatusException if transaction is not found or error occurs
    */
-  @Operation(summary = "Получить транзакцию по ID",
-          description = "Возвращает транзакцию по ее идентификатору")
+  @Operation(summary = "Get transaction by ID",
+          description = "Returns a transaction by its identifier")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Транзакция найдена"),
-      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+      @ApiResponse(responseCode = "200", description = "Transaction found"),
+      @ApiResponse(responseCode = "400", description = "Invalid ID format"),
+      @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @GetMapping("/{id}")
-  public Transaction findTransactionById(@PathVariable Long id) {
-    return transactionService.findTransactionById(id)
-            .orElseThrow(() -> new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id));
+  public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
+    try {
+      return transactionService.findTransactionById(id)
+              .map(ResponseEntity::ok)
+              .orElseThrow(() -> new ResponseStatusException(
+                      HttpStatus.NOT_FOUND, "Transaction not found with ID: " + id));
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
   }
 
   /**
    * Creates a new transaction.
    *
-   * @param transaction the transaction to create
-   * @return the created transaction
-   * @throws IllegalArgumentException if the account ID is null or the transaction type is invalid
-   * @throws ResourceNotFoundException if the account is not found
+   * @param transaction the transaction data to create
+   * @return ResponseEntity containing the created transaction
    */
-  @Operation(summary = "Создать новую транзакцию",
-          description = "Создает новую транзакцию (кредит или дебет)")
+  @Operation(summary = "Create new transaction",
+          description = "Creates a new transaction. Supported types: "
+                  + "'credit' (deposit), 'debit' (withdrawal)")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "Транзакция успешно создана"),
-      @ApiResponse(responseCode = "400", description = "Неверные входные данные"),
-      @ApiResponse(responseCode = "404", description = "Счет не найден"),
-      @ApiResponse(responseCode = "409", description = "Недостаточно средств")
+      @ApiResponse(responseCode = "201", description = "Transaction created successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid input data"),
+      @ApiResponse(responseCode = "404", description = "Account not found"),
+      @ApiResponse(responseCode = "409", description = "Insufficient funds")
   })
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public Transaction createTransaction(@RequestBody Transaction transaction) {
-    if (transaction.getAccountId() == null) {
-      throw new IllegalArgumentException("Account ID cannot be null");
+  public ResponseEntity<?> createTransaction(@Valid @RequestBody Transaction transaction) {
+    try {
+      if (transaction.getTransactionType() != null) {
+        transaction.setTransactionType(transaction.getTransactionType().toLowerCase());
+      }
+      Transaction created = transactionService.createTransaction(transaction);
+      return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    } catch (ValidationException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (ResourceNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError().body("An error occurred: " + e.getMessage());
     }
-
-    String transactionType = transaction.getTransactionType().toLowerCase();
-
-    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
-            && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
-      throw new IllegalArgumentException("Unknown transaction type: "
-              + transaction.getTransactionType());
-    }
-
-    Account account = accountRepository.findById(transaction.getAccountId())
-            .orElseThrow(() -> new ResourceNotFoundException("Account with ID "
-                    + transaction.getAccountId() + " not found"));
-
-    updateBalances(account, transaction);
-
-    accountRepository.save(account);
-
-    transaction.setAccount(account);
-    return transactionService.createTransaction(transaction);
   }
 
   /**
    * Updates an existing transaction.
    *
    * @param id the ID of the transaction to update
-   * @param transaction the updated transaction details
-   * @return the updated transaction
-   * @throws ResourceNotFoundException if the transaction is not found
+   * @param transaction the updated transaction data
+   * @return ResponseEntity containing the updated transaction
    */
-  @Operation(summary = "Обновить транзакцию", description = "Обновляет существующую транзакцию")
+  @Operation(summary = "Update transaction",
+          description = "Updates an existing transaction")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Транзакция успешно обновлена"),
-      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+      @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid input data"),
+      @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @PutMapping("/{id}")
-  public Transaction updateTransaction(@PathVariable Long id,
-                                       @RequestBody Transaction transaction) {
-    if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id);
+  public ResponseEntity<Transaction> updateTransaction(
+          @PathVariable Long id,
+          @Valid @RequestBody Transaction transaction) {
+    try {
+      Transaction updated = transactionService.updateTransaction(id, transaction);
+      return ResponseEntity.ok(updated);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
-    return transactionService.updateTransaction(id, transaction);
   }
 
   /**
    * Deletes a transaction by its ID.
    *
    * @param id the ID of the transaction to delete
-   * @throws ResourceNotFoundException if the transaction is not found
    */
-  @Operation(summary = "Удалить транзакцию", description = "Удаляет транзакцию по ее ID")
+  @Operation(summary = "Delete transaction",
+          description = "Deletes a transaction by its ID")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Транзакция успешно удалена"),
-      @ApiResponse(responseCode = "404", description = "Транзакция не найдена")
+      @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
+      @ApiResponse(responseCode = "400", description = "Invalid ID format"),
+      @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteTransaction(@PathVariable Long id) {
-    if (transactionService.findTransactionById(id).isEmpty()) {
-      throw new ResourceNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE + id);
-    }
-    transactionService.deleteTransaction(id);
-  }
-
-  /**
-   * Updates the account balance based on the transaction type.
-   *
-   * @param account the account to update
-   * @param transaction the transaction to apply
-   * @throws IllegalArgumentException if the transaction type is invalid or insufficient funds
-   */
-  private void updateBalances(Account account, Transaction transaction) {
-    double amount = transaction.getAmount();
-    String transactionType = transaction.getTransactionType().toLowerCase();
-
-    if (!TRANSACTION_TYPE_CREDIT.equals(transactionType)
-            && !TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
-      throw new IllegalArgumentException("Unknown transaction type: "
-              + transaction.getTransactionType());
-    }
-
-    if (TRANSACTION_TYPE_DEBIT.equals(transactionType)) {
-      account.setBalance(account.getBalance() + amount);
-    } else {
-      if (account.getBalance() - amount < 0) {
-        throw new IllegalArgumentException("Insufficient funds in the account!");
-      }
-      account.setBalance(account.getBalance() - amount);
-    }
-
-    // Ensure balance does not become negative
-    if (account.getBalance() < 0) {
-      throw new IllegalArgumentException("Account balance cannot be negative!");
+    try {
+      transactionService.deleteTransaction(id);
+    } catch (Exception e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
 }

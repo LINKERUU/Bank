@@ -5,9 +5,11 @@ import com.bank.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,10 +78,12 @@ public class CardController {
   @Operation(summary = "Создать новую карту",
           description = "Создает новую банковскую карту")
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")
+  @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Card createCard(@RequestBody Card card) {
-    return cardService.createCard(card);
+  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card) {
+    Card createdCard = cardService.createCard(card);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
   }
 
   /**
@@ -110,8 +114,13 @@ public class CardController {
       @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @PutMapping("/{id}")
-  public Card updateCard(@PathVariable Long id, @RequestBody Card card) {
-    return cardService.updateCard(id, card);
+  public ResponseEntity<?> updateCard(@PathVariable Long id, @Valid @RequestBody Card card) {
+    try {
+      Card updatedCard = cardService.updateCard(id, card);
+      return ResponseEntity.ok(updatedCard);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Invalid card data: " + e.getMessage());
+    }
   }
 
   /**

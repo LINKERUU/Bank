@@ -1,10 +1,12 @@
 package com.bank.controller;
 
+import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -75,10 +77,12 @@ public class AccountController {
    */
   @Operation(summary = "Создать новый счет", description = "Создает новый банковский счет")
   @ApiResponse(responseCode = "201", description = "Счет успешно создан")
+  @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Account createAccount(@RequestBody Account account) {
-    return accountService.createAccount(account);
+  public ResponseEntity<?> createAccount(@Valid @RequestBody Account account) {
+    Account createdAccount = accountService.createAccount(account);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
   }
 
   /**

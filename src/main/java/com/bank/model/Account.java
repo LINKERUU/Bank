@@ -13,6 +13,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -21,10 +26,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
- * Represents a bank account entity.
+ * Entity class representing a bank account.
+ * Contains account details including account number, balance,
+ * associated cards, users and transactions.
  */
+
 @Entity
 @Table(name = "accounts")
 @Getter
@@ -37,9 +44,14 @@ public class Account {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @NotBlank(message = "Account number cannot be blank")
+  @Size(min = 10, max = 20, message = "Account number must be between 10 and 20 characters")
+  @Pattern(regexp = "^[0-9]+$", message = "Account number must contain only digits")
   @Column(name = "account_number", unique = true, nullable = false, length = 20)
   private String accountNumber;
 
+  @NotNull(message = "Balance cannot be null")
+  @DecimalMin(value = "0.0", message = "Balance cannot be negative")
   @Column(name = "balance", nullable = false)
   private Double balance = 0.0;
 

@@ -1,6 +1,7 @@
 package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
+import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
@@ -70,9 +71,20 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public Account createAccount(Account account) {
+    // Валидация данных
+    if (account.getAccountNumber() == null || account.getAccountNumber().length() < 10
+            || account.getAccountNumber().length() > 20) {
+      throw new ValidationException("The account number must"
+              + " be between 10 and 20 characters long.");
+    }
+    if (!account.getAccountNumber().matches("^[0-9]+$")) {
+      throw new ValidationException("The account number must contain only numbers.");
+    }
+    if (account.getBalance() == null || account.getBalance() < 0) {
+      throw new ValidationException("The balance cannot be negative");
+    }
     if (account.getUsers() == null || account.getUsers().isEmpty()) {
-      throw new IllegalArgumentException("Аккаунт должен "
-              + "быть привязан хотя бы к одному пользователю.");
+      throw new ValidationException("The account must be linked to at least one user.");
     }
 
     Account savedAccount = accountRepository.save(account);

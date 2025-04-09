@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Global exception handler for REST controllers.
- * Handles various types of exceptions and returns appropriate HTTP responses.
+ * Provides centralized exception handling across all controllers.
  */
+
 @ControllerAdvice
 @Order(0) // Устанавливаем порядок обработки
 public class GlobalExceptionHandler {
@@ -27,13 +28,13 @@ public class GlobalExceptionHandler {
   /**
    * Handles validation exceptions for method arguments.
    *
-   * @param ex the MethodArgumentNotValidException that was thrown
-   * @return ResponseEntity containing a map of field errors with BAD_REQUEST status
+   * @param ex the MethodArgumentNotValidException to handle
+   * @return ResponseEntity containing field errors and HTTP status 400
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseEntity<Map<String, String>>
-      handleValidationExceptions(MethodArgumentNotValidException ex) {
+  public ResponseEntity<Map<String, String>> handleValidationExceptions(
+          MethodArgumentNotValidException ex) {
     Map<String, String> errors = new HashMap<>();
     ex.getBindingResult().getAllErrors().forEach(error -> {
       String fieldName = ((FieldError) error).getField();
@@ -47,28 +48,29 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
   }
 
+  // Обработка кас томного исключения ValidationException
   /**
    * Handles custom validation exceptions.
    *
-   * @param ex the ValidationException that was thrown
-   * @return ResponseEntity containing the error message with BAD_REQUEST status
+   * @param ex the ValidationException to handle
+   * @return ResponseEntity with error message and HTTP status 400
    */
-  // Обработка кас томного исключения ValidationException
   @ExceptionHandler(ValidationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseEntity<String> handleValidationException(ValidationException ex) {
     // Дотируем ошибку с уровнем ERROR
-    logger.error("Validation error: {}", ex.getMessage());
+    if (logger.isErrorEnabled()) {
+      logger.error("Validation error: {}", ex.getMessage());
+    }
     return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 
   // Обработка других исключений (500)
   /**
-   * Handles all other unexpected exceptions.
+   * Handles custom validation exceptions.
    *
-   * @param ex the caught Exception
-   * @return ResponseEntity containing error message with INTERNAL_SERVER_ERROR status,
-   *         except for Swagger-related errors which return OK status
+   * @param ex the ValidationException to handle
+   * @return ResponseEntity with error message and HTTP status 400
    */
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

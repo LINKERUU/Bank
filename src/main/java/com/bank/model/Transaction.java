@@ -12,6 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,10 +37,15 @@ public class Transaction {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "amount", nullable = false)
+  @NotNull(message = "Amount cannot be null")
+  @Positive(message = "Amount must be positive")
+  @Column(name = "amount")
   private Double amount;
 
-  @Column(name = "transaction_type", nullable = false, length = 10)
+  @NotNull(message = "Transaction type cannot be null")
+  @Pattern(regexp = "credit|debit", flags = Pattern.Flag.CASE_INSENSITIVE,
+          message = "Transaction type must be 'credit' or 'debit'")
+  @Column(name = "transaction_type")
   private String transactionType;
 
   @Column(name = "description")

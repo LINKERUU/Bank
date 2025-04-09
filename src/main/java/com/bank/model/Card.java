@@ -11,6 +11,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import java.time.YearMonth;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,19 +37,26 @@ public class Card {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "card_number", unique = true, nullable = false, length = 16)
+  @NotNull(message = "Номер карты обязателен")
+  @Size(min = 16, max = 16, message = "Номер карты должен содержать 16 цифр")
+  @Pattern(regexp = "^[0-9]+$", message = "Номер карты должен содержать только цифры")
+  @Column(name = "card_number", unique = true)
   private String cardNumber;
 
-  @Column(name = "expiration_date", nullable = false)
+  @NotNull(message = "Срок действия обязателен")
+  @Future(message = "Срок действия карты должен быть в будущем")
+  @Column(name = "expiration_date")
   private YearMonth expirationDate;
 
-  @Column(name = "cvv", nullable = false, length = 3)
+  @NotNull(message = "CVV код обязателен")
+  @Size(min = 3, max = 3, message = "CVV код должен содержать 3 цифры")
+  @Pattern(regexp = "^[0-9]+$", message = "CVV код должен содержать только цифры")
+  @Column(name = "cvv")
   private String cvv;
 
   @JsonBackReference
-  @ManyToOne(
-          fetch = FetchType.LAZY,
-          cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id", nullable = false)
+  @NotNull(message = "Карта должна быть привязана к счету")
   private Account account;
 }

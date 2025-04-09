@@ -1,6 +1,7 @@
 package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
+import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.repository.AccountRepository;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service implementation for user management operations.
- * Provides CRUD functionality for users with password hashing and caching support.
- * Manages user-account relationships and ensures data consistency.
+ * Implementation of the UserService interface providing CRUD operations for User entities.
+ * This service handles user management including creation, retrieval, update, and deletion,
+ * with proper validation and caching mechanisms.
  */
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,12 +31,9 @@ public class UserServiceImpl implements UserService {
   private final InMemoryCache<Long, User> userCache;
 
   /**
-   * Constructs a UserServiceImpl with required dependencies.
+   * Constructs a new UserServiceImpl with required repositories.
    *
-   * @param userRepository repository for user data access
-   * @param passwordService service for password hashing operations
-   * @param accountRepository repository for account data access
-   * @param userCache in-memory cache for user entities
+   * @param userRepository repository for transaction data access
    */
   @Autowired
   public UserServiceImpl(UserRepository userRepository,
@@ -51,7 +49,6 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional(readOnly = true)
   public List<User> findAllUsers() {
-    // Не кэшируем список пользователей
     return userRepository.findAll();
   }
 
@@ -71,6 +68,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public User createUser(User user) {
+    validateUser(user);
     user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
     User savedUser = userRepository.save(user);
     userCache.put(savedUser.getId(), savedUser);
@@ -80,6 +78,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public List<User> createUsers(List<User> users) {
+    users.forEach(this::validateUser);
     users.forEach(user ->
             user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()))
     );
@@ -94,11 +93,76 @@ public class UserServiceImpl implements UserService {
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
+    validateUserForUpdate(updatedUser, existingUser);
     updateUserFields(existingUser, updatedUser);
 
     User savedUser = userRepository.save(existingUser);
     userCache.put(id, savedUser);
     return savedUser;
+  }
+
+  private void validateUser(User user) {
+    if (user == null) {
+      throw new ValidationException("User cannot be null");
+    }
+
+    if (user.getEmail() == null || user.getEmail().isBlank()) {
+      throw new ValidationException("Email is required");
+    }
+
+    if (user.getPhone() == null || user.getPhone().isBlank()) {
+      throw new ValidationException("Phone is required");
+    }
+
+    if (user.getPasswordHash() == null || user.getPasswordHash().isBlank()) {
+      throw new ValidationException("Password is required");
+    }
+
+    if (userRepository.existsById(Long.valueOf(user.getEmail()))) {
+      throw new ValidationException("User with this email already exists");
+    }
+
+    if (userRepository.existsById(Long.valueOf(user.getPhone()))) {
+      throw new ValidationException("User with this phone already exists");
+    }
+
+    validatePasswordStrength(user.getPasswordHash());
+  }
+
+  private void validateUserForUpdate(User updatedUser, User existingUser) {
+    if (updatedUser.getEmail() != null
+            && !updatedUser.getEmail().equals(existingUser.getEmail())
+            && userRepository.existsById(Long.valueOf(updatedUser.getEmail()))) {
+      throw new ValidationException("User with this email already exists");
+    }
+
+    if (updatedUser.getPhone() != null
+            && !updatedUser.getPhone().equals(existingUser.getPhone())
+            && userRepository.existsById(Long.valueOf(updatedUser.getPhone()))) {
+      throw new ValidationException("User with this phone already exists");
+    }
+
+    if (updatedUser.getPasswordHash() != null) {
+      validatePasswordStrength(updatedUser.getPasswordHash());
+    }
+  }
+
+  private void validatePasswordStrength(String password) {
+    if (password.length() < 8) {
+      throw new ValidationException("Password must be at least 8 characters long");
+    }
+
+    if (!password.matches(".*[A-ZА-Я].*")) {
+      throw new ValidationException("Password must contain at least one uppercase letter");
+    }
+
+    if (!password.matches(".*[0-9].*")) {
+      throw new ValidationException("Password must contain at least one digit");
+    }
+
+    if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>?].*")) {
+      throw new ValidationException("Password must contain at least one special character");
+    }
   }
 
   @Override
@@ -107,7 +171,6 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-    // Удаляем пользователя из связанных аккаунтов
     for (Account account : user.getAccounts()) {
       account.getUsers().remove(user);
       if (account.getUsers().isEmpty()) {

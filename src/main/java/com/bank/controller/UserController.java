@@ -6,8 +6,10 @@ import com.bank.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,10 +80,16 @@ public class UserController {
    */
   @Operation(summary = "Создать нового пользователя", description = "Создает нового пользователя")
   @ApiResponse(responseCode = "201", description = "Пользователь успешно создан")
+  @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public User createUser(@RequestBody User user) {
-    return userService.createUser(user);
+  public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+    try {
+      User createdUser = userService.createUser(user);
+      return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Invalid user data: " + e.getMessage());
+    }
   }
 
   /**

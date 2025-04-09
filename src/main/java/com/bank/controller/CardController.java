@@ -114,7 +114,7 @@ public class CardController {
       @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<?> updateCard(@PathVariable Long id, @Valid @RequestBody Card card) {
+  public ResponseEntity<Card> updateCard(@PathVariable Long id, @Valid @RequestBody Card card) {
     try {
       Card updatedCard = cardService.updateCard(id, card);
       return ResponseEntity.ok(updatedCard);

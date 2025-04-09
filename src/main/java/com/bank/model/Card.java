@@ -1,7 +1,6 @@
 package com.bank.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
  * Represents a bank card entity.
  */
@@ -37,26 +35,26 @@ public class Card {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotNull(message = "Номер карты обязателен")
-  @Size(min = 16, max = 16, message = "Номер карты должен содержать 16 цифр")
-  @Pattern(regexp = "^[0-9]+$", message = "Номер карты должен содержать только цифры")
+  @NotNull(message = "Card number is required")
+  @Size(min = 16, max = 16, message = "Card number must be exactly 16 digits")
+  @Pattern(regexp = "^\\d+$", message = "Card number must contain only digits")
   @Column(name = "card_number", unique = true)
   private String cardNumber;
 
-  @NotNull(message = "Срок действия обязателен")
-  @Future(message = "Срок действия карты должен быть в будущем")
+  @NotNull(message = "Expiration date is required")
+  @Future(message = "Expiration date must be in the future")
   @Column(name = "expiration_date")
   private YearMonth expirationDate;
 
-  @NotNull(message = "CVV код обязателен")
-  @Size(min = 3, max = 3, message = "CVV код должен содержать 3 цифры")
-  @Pattern(regexp = "^[0-9]+$", message = "CVV код должен содержать только цифры")
+  @NotNull(message = "CVV code is required")
+  @Size(min = 3, max = 3, message = "CVV code must be exactly 3 digits")
+  @Pattern(regexp = "^\\d+$", message = "CVV code must contain only digits")
   @Column(name = "cvv")
   private String cvv;
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id", nullable = false)
-  @NotNull(message = "Карта должна быть привязана к счету")
+  @NotNull(message = "Card must be linked to an account")
   private Account account;
 }

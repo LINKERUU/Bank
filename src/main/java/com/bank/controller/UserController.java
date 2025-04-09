@@ -83,7 +83,7 @@ public class UserController {
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+  public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
     try {
       User createdUser = userService.createUser(user);
       return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);

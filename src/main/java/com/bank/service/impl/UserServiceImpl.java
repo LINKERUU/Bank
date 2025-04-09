@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
       throw new ValidationException("Password must contain at least one uppercase letter");
     }
 
-    if (!password.matches(".*[0-9].*")) {
+    if (!password.matches(".*\\d].*")) {
       throw new ValidationException("Password must contain at least one digit");
     }
 

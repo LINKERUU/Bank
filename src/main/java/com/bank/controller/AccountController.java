@@ -80,7 +80,7 @@ public class AccountController {
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<?> createAccount(@Valid @RequestBody Account account) {
+  public ResponseEntity<Account> createAccount(@Valid @RequestBody Account account) {
     Account createdAccount = accountService.createAccount(account);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
   }

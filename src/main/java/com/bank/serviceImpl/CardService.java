@@ -1,4 +1,4 @@
-package com.bank.service;
+package com.bank.serviceImpl;
 
 import com.bank.model.Card;
 import java.util.List;

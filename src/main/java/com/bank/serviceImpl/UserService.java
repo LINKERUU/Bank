@@ -1,4 +1,4 @@
-package com.bank.service;
+package com.bank.serviceImpl;
 
 import com.bank.model.User;
 import java.util.List;

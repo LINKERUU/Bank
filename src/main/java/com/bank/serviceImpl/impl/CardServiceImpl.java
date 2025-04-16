@@ -1,10 +1,10 @@
-package com.bank.service.impl;
+package com.bank.serviceImpl.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Card;
 import com.bank.repository.CardRepository;
-import com.bank.service.CardService;
+import com.bank.serviceImpl.CardService;
 import com.bank.utils.InMemoryCache;
 import java.time.YearMonth;
 import java.util.List;

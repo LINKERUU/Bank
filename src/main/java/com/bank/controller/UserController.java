@@ -2,10 +2,11 @@ package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.User;
-import com.bank.service.UserService;
+import com.bank.serviceImpl.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User Controller", description = "API для работы с пользователями")
 public class UserController {
 
   private static final String USER_NOT_FOUND_MESSAGE = "Not found User with id: ";

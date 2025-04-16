@@ -1,4 +1,4 @@
-package com.bank.service;
+package com.bank.serviceImpl;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

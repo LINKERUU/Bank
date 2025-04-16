@@ -1,14 +1,17 @@
-package com.bank.service.impl;
+package com.bank.serviceImpl.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
-import com.bank.service.AccountService;
+import com.bank.serviceImpl.AccountService;
 import com.bank.utils.InMemoryCache;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,9 +98,42 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public List<Account> createAccounts(List<Account> accounts) {
-    List<Account> savedAccounts = accountRepository.saveAll(accounts);
-    savedAccounts.forEach(acc -> accountCache.put(acc.getId(), acc));
-    return savedAccounts;
+    // Валидация всех счетов перед сохранением
+    List<String> validationErrors = accounts.stream()
+            .map(account -> {
+              try {
+                validateAccount(account);
+                return null;
+              } catch (ValidationException e) {
+                return "Account " + account.getAccountNumber() + ": " + e.getMessage();
+              }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+    if (!validationErrors.isEmpty()) {
+      throw new ValidationException("Batch validation failed:\n" +
+              String.join("\n", validationErrors));
+    }
+
+    // Сохранение и кэширование
+    return accounts.stream()
+            .map(accountRepository::save)
+            .peek(account -> accountCache.put(account.getId(), account))
+            .collect(Collectors.toList());
+  }
+
+  private void validateAccount(Account account) {
+    if (account.getAccountNumber() == null || account.getAccountNumber().length() < 10
+            || account.getAccountNumber().length() > 20) {
+      throw new ValidationException("Account number must be between 10 and 20 characters");
+    }
+    if (!account.getAccountNumber().matches("^\\d+$")) {
+      throw new ValidationException("Account number must contain only digits");
+    }
+    if (account.getBalance() == null || account.getBalance() < 0) {
+      throw new ValidationException("Balance cannot be negative");
+    }
   }
 
   @Override
@@ -116,6 +152,23 @@ public class AccountServiceImpl implements AccountService {
 
   @Override
   @Transactional
+  public void deleteAccounts(List<Long> ids) {
+    ids.forEach(id -> {
+      Account account = accountRepository.findById(id)
+              .orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + id));
+
+      // Удаляем связанные карты
+      if (account.getCards() != null && !account.getCards().isEmpty()) {
+        cardRepository.deleteAll(account.getCards());
+      }
+
+      accountRepository.delete(account);
+      accountCache.evict(id);
+    });
+  }
+
+  @Override
+  @Transactional
   public Account updateAccount(Long id, Account updatedAccount) {
     Account existingAccount = accountRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Аккаунт с ID " + id + " не найден."));
@@ -130,5 +183,30 @@ public class AccountServiceImpl implements AccountService {
     Account savedAccount = accountRepository.save(existingAccount);
     accountCache.put(id, savedAccount);
     return savedAccount;
+  }
+
+  @Override
+  @Transactional
+  public List<Account> updateAccounts(List<Account> accounts) {
+    return accounts.stream()
+            .peek(account -> {
+              if (account.getId() == null) {
+                throw new ValidationException("Account ID cannot be null for update");
+              }
+            })
+            .map(account -> {
+              Account existing = accountRepository.findById(account.getId())
+                      .orElseThrow(() -> new ResourceNotFoundException(
+                              "Account not found with id: " + account.getId()));
+
+              // Обновляем только разрешенные поля
+              if (account.getBalance() != null) {
+                existing.setBalance(account.getBalance());
+              }
+              return existing;
+            })
+            .map(accountRepository::save)
+            .peek(account -> accountCache.put(account.getId(), account))
+            .collect(Collectors.toList());
   }
 }

@@ -1,4 +1,4 @@
-package com.bank.service.impl;
+package com.bank.serviceImpl.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
@@ -6,8 +6,8 @@ import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.UserRepository;
-import com.bank.service.PasswordService;
-import com.bank.service.UserService;
+import com.bank.serviceImpl.PasswordService;
+import com.bank.serviceImpl.UserService;
 import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Optional;
@@ -148,21 +148,57 @@ public class UserServiceImpl implements UserService {
   }
 
   private void validatePasswordStrength(String password) {
+    // Check length first
     if (password.length() < 8) {
       throw new ValidationException("Password must be at least 8 characters long");
     }
 
-    if (!password.matches(".*[A-ZА-Я].*")) {
+    // Check for at least one uppercase letter (English and Cyrillic)
+    if (!containsUppercase(password)) {
       throw new ValidationException("Password must contain at least one uppercase letter");
     }
 
-    if (!password.matches(".*\\d].*")) {
+    // Check for at least one digit (using \\d)
+    if (!containsDigit(password)) {
       throw new ValidationException("Password must contain at least one digit");
     }
 
-    if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>?].*")) {
+    // Check for at least one special character
+    if (!containsSpecialChar(password)) {
       throw new ValidationException("Password must contain at least one special character");
     }
+  }
+
+  // Optimized regex checks with no catastrophic backtracking potential
+  private boolean containsUppercase(String password) {
+    // Simple character check without regex
+    for (char c : password.toCharArray()) {
+      if (Character.isUpperCase(c)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean containsDigit(String password) {
+    // Simple character check without regex
+    for (char c : password.toCharArray()) {
+      if (Character.isDigit(c)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean containsSpecialChar(String password) {
+    // Defined set of special characters
+    String specialChars = "!@#$%^&*()_+-=[]{};':\"\\|,.<>?";
+    for (char c : password.toCharArray()) {
+      if (specialChars.indexOf(c) >= 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

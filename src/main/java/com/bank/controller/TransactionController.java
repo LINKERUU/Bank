@@ -3,10 +3,11 @@ package com.bank.controller;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Transaction;
-import com.bank.service.TransactionService;
+import com.bank.serviceImpl.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @RestController
 @RequestMapping("/api/transactions")
+@Tag(name = "Transaction Controller", description = "API для работы с транзакциями")
 public class TransactionController {
 
   private final TransactionService transactionService;

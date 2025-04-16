@@ -1,11 +1,11 @@
 package com.bank.controller;
 
-import com.bank.exception.ValidationException;
 import com.bank.model.Account;
-import com.bank.service.AccountService;
+import com.bank.serviceImpl.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/accounts")
+@Tag(name = "Account Controller", description = "API для работы со счетами")
 public class AccountController {
 
   private final AccountService accountService;
@@ -118,6 +119,23 @@ public class AccountController {
   }
 
   /**
+   * Batch update of accounts
+   * @param accounts List of accounts to update
+   * @return List of updated accounts
+   */
+  @Operation(summary = "Массовое обновление счетов",
+          description = "Обновляет несколько счетов одновременно")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "200", description = "Счета успешно обновлены"),
+          @ApiResponse(responseCode = "400", description = "Некорректные данные"),
+          @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
+  })
+  @PutMapping("/batch")
+  public ResponseEntity<List<Account>> updateAccounts(@Valid @RequestBody List<Account> accounts) {
+    return ResponseEntity.ok(accountService.updateAccounts(accounts));
+  }
+
+  /**
    * Deletes an account by its ID.
    *
    * @param id the ID of the account to delete
@@ -156,6 +174,18 @@ public class AccountController {
   @GetMapping("/with-cards")
   public ResponseEntity<List<Account>> getAccountsWithCards() {
     return ResponseEntity.ok(accountService.findAccountsWithCards());
+  }
+
+  @Operation(summary = "Массовое удаление счетов",
+          description = "Удаляет несколько счетов по их ID")
+  @ApiResponses(value = {
+          @ApiResponse(responseCode = "204", description = "Счета успешно удалены"),
+          @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
+  })
+  @DeleteMapping("/batch")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAccounts(@RequestBody List<Long> ids) {
+    accountService.deleteAccounts(ids);
   }
 
 }

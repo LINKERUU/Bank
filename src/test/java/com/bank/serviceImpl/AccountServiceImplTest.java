@@ -214,7 +214,7 @@ class AccountServiceImplTest {
     List<Account> result = accountService.findByUserEmail("test@example.com");
 
     assertEquals(1, result.size());
-    assertEquals(1L, result.getFirst().getId());
+    assertEquals(1L, result.get(0).getId()); // Заменили getFirst() на get(0)
   }
 
   @Test
@@ -225,6 +225,6 @@ class AccountServiceImplTest {
     List<Account> result = accountService.findAccountsWithCards();
 
     assertEquals(1, result.size());
-    assertEquals(1L, result.getFirst().getId());
+    assertEquals(1L, result.get(0).getId()); // Заменили getFirst() на get(0)
   }
 }

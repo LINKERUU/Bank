@@ -1100,3 +1100,33 @@ Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No q
 2025-04-17T22:38:42.997+03:00  INFO 44620 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-04-17T22:38:43.001+03:00  INFO 44620 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2025-04-17T22:38:43.006+03:00  INFO 44620 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T23:14:31.147+03:00  INFO 35416 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 35416 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T23:14:31.148+03:00 DEBUG 35416 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T23:14:31.148+03:00  INFO 35416 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T23:14:31.809+03:00  INFO 35416 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T23:14:31.866+03:00  INFO 35416 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 48 ms. Found 4 JPA repository interfaces.
+2025-04-17T23:14:32.412+03:00  INFO 35416 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T23:14:32.478+03:00  INFO 35416 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T23:14:32.505+03:00  INFO 35416 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T23:14:32.806+03:00  INFO 35416 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T23:14:32.835+03:00  INFO 35416 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T23:14:32.990+03:00  INFO 35416 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@c82d925
+2025-04-17T23:14:32.992+03:00  INFO 35416 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T23:14:33.023+03:00  WARN 35416 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T23:14:33.042+03:00  INFO 35416 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T23:14:33.759+03:00  INFO 35416 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T23:14:33.973+03:00  INFO 35416 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T23:14:34.402+03:00  INFO 35416 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T23:14:35.478+03:00  WARN 35416 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T23:14:35.557+03:00  INFO 35416 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T23:14:36.392+03:00  INFO 35416 --- [Bank] [main] com.bank.BankApplicationTests            : Started BankApplicationTests in 5.532 seconds (process running for 6.516)
+2025-04-17T23:14:38.001+03:00  INFO 35416 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T23:14:38.006+03:00  INFO 35416 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T23:14:38.015+03:00  INFO 35416 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

@@ -37,7 +37,7 @@ class AccountControllerTest {
     List<Account> result = accountController.findAllAccounts();
 
     assertEquals(1, result.size());
-    assertEquals("1234567890", result.getFirst().getAccountNumber());
+    assertEquals("1234567890", result.get(0).getAccountNumber()); // Исправлено здесь
   }
 
   @Test
@@ -74,7 +74,7 @@ class AccountControllerTest {
     List<Account> result = accountController.createAccounts(List.of(account));
 
     assertEquals(1, result.size());
-    assertEquals(1L, result.getFirst().getId());
+    assertEquals(1L, result.get(0).getId()); // Исправлено здесь
   }
 
   @Test

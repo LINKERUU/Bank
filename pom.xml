@@ -27,13 +27,8 @@
         <url/>
     </scm>
     <properties>
-        <sonar.organization>SAFA</sonar.organization>
-        <sonar.projectKey>Bank</sonar.projectKey>
+        <sonar.organization>linkeruu</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.coverage.jacoco.xmlReportPaths>
-            ../app-it/target/site/jacoco-aggregate/jacoco.xml
-        </sonar.coverage.jacoco.xmlReportPaths>
-        <java.version>21</java.version>
     </properties>
     <dependencies>
 

@@ -1,4 +1,4 @@
-package com.bank.serviceImpl.impl;
+package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
@@ -6,8 +6,8 @@ import com.bank.model.Account;
 import com.bank.model.User;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.UserRepository;
-import com.bank.serviceImpl.PasswordService;
-import com.bank.serviceImpl.UserService;
+import com.bank.service.PasswordService;
+import com.bank.service.UserService;
 import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Optional;

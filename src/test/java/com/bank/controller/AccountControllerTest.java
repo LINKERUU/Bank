@@ -1,7 +1,7 @@
 package com.bank.controller;
 
 import com.bank.model.Account;
-import com.bank.serviceImpl.AccountService;
+import com.bank.service.AccountService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,4 +1,4 @@
-package com.bank.serviceImpl;
+package com.bank.service;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
@@ -7,7 +7,7 @@ import com.bank.model.Card;
 import com.bank.model.User;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
-import com.bank.serviceImpl.impl.AccountServiceImpl;
+import com.bank.service.impl.AccountServiceImpl;
 import com.bank.utils.InMemoryCache;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

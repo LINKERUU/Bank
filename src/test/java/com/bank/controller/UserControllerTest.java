@@ -2,7 +2,7 @@ package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.User;
-import com.bank.serviceImpl.UserService;
+import com.bank.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

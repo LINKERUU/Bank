@@ -1,17 +1,16 @@
-package com.bank.serviceImpl.impl;
+package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Account;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
-import com.bank.serviceImpl.AccountService;
+import com.bank.service.AccountService;
 import com.bank.utils.InMemoryCache;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +94,8 @@ public class AccountServiceImpl implements AccountService {
               try {
                 validateAccount(account);
                 if (account.getUsers() == null || account.getUsers().isEmpty()) {
-                  return "Account " + account.getAccountNumber() + ": must be linked to at least one user";
+                  return "Account " + account.getAccountNumber()
+                          + ": must be linked to at least one user";
                 }
                 return null;
               } catch (ValidationException e) {
@@ -106,8 +106,8 @@ public class AccountServiceImpl implements AccountService {
             .collect(Collectors.toList());
 
     if (!validationErrors.isEmpty()) {
-      throw new ValidationException("Batch validation failed:\n" +
-              String.join("\n", validationErrors));
+      throw new ValidationException("Batch validation failed:\n"
+              + String.join("\n", validationErrors));
     }
 
     List<Account> savedAccounts = accountRepository.saveAll(accounts);

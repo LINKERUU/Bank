@@ -3,7 +3,7 @@ package com.bank.controller;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Transaction;
-import com.bank.serviceImpl.TransactionService;
+import com.bank.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -96,7 +96,8 @@ public class TransactionController {
       @ApiResponse(responseCode = "409", description = "Insufficient funds")
   })
   @PostMapping
-  public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody Transaction transaction) {
+  public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody
+                                                         Transaction transaction) {
     try {
       if (transaction.getTransactionType() != null) {
         transaction.setTransactionType(transaction.getTransactionType().toLowerCase());

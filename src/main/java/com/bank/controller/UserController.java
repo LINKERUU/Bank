@@ -2,7 +2,7 @@ package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.model.User;
-import com.bank.serviceImpl.UserService;
+import com.bank.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

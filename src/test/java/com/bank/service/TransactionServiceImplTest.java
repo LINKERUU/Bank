@@ -1,4 +1,4 @@
-package com.bank.serviceImpl;
+package com.bank.service;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
@@ -6,7 +6,7 @@ import com.bank.model.Account;
 import com.bank.model.Transaction;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.TransactionRepository;
-import com.bank.serviceImpl.impl.TransactionServiceImpl;
+import com.bank.service.impl.TransactionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

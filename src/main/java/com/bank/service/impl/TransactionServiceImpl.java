@@ -1,4 +1,4 @@
-package com.bank.serviceImpl.impl;
+package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
@@ -6,7 +6,7 @@ import com.bank.model.Account;
 import com.bank.model.Transaction;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.TransactionRepository;
-import com.bank.serviceImpl.TransactionService;
+import com.bank.service.TransactionService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;

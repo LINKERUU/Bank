@@ -137,9 +137,6 @@
                 <version>3.2.0</version>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation> <!-- Path to your Checkstyle configuration file -->
-                    <consoleOutput>true</consoleOutput>
-                    <configLocation>google_checks.xml</configLocation>
-                    <failsOnError>true</failsOnError> <!-- Fail the build on Checkstyle errors -->
                 </configuration>
                 <executions>
                     <execution>

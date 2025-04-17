@@ -1,7 +1,7 @@
 package com.bank.controller;
 
 import com.bank.model.Card;
-import com.bank.serviceImpl.CardService;
+import com.bank.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -81,6 +81,7 @@ public class CardController {
    * @param card the card to create
    * @return the created card
    */
+
   @Operation(summary = "Создать новую карту",
           description = "Создает новую банковскую карту")
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")

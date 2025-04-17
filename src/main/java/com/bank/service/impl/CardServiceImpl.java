@@ -1,10 +1,10 @@
-package com.bank.serviceImpl.impl;
+package com.bank.service.impl;
 
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Card;
 import com.bank.repository.CardRepository;
-import com.bank.serviceImpl.CardService;
+import com.bank.service.CardService;
 import com.bank.utils.InMemoryCache;
 import java.time.YearMonth;
 import java.util.List;
@@ -67,23 +67,11 @@ public class CardServiceImpl implements CardService {
 
     // Дополнительные проверки
     validateExpirationDate(card);
-    validateCVV(card);
+    validateCvv(card.getCvv());
 
     Card savedCard = cardRepository.save(card);
     cardCache.put(savedCard.getId(), savedCard);
     return savedCard;
-  }
-
-  private void validateExpirationDate(Card card) {
-    if (card.getExpirationDate() == null || card.getExpirationDate().isBefore(YearMonth.now())) {
-      throw new ValidationException("Invalid expiration date");
-    }
-  }
-
-  private void validateCVV(Card card) {
-    if (card.getCvv() == null || card.getCvv().length() < 3 || card.getCvv().length() > 4) {
-      throw new ValidationException("CVV must be 3 or 4 digits");
-    }
   }
 
   @Override
@@ -152,6 +140,13 @@ public class CardServiceImpl implements CardService {
     }
     if (expirationDate.isBefore(YearMonth.now())) {
       throw new ValidationException("The card has expired");
+    }
+  }
+
+
+  private void validateExpirationDate(Card card) {
+    if (card.getExpirationDate() == null || card.getExpirationDate().isBefore(YearMonth.now())) {
+      throw new ValidationException("Invalid expiration date");
     }
   }
 

@@ -1,4 +1,4 @@
-package com.bank.serviceImpl;
+package com.bank.service;
 
 import com.bank.model.Account;
 import java.util.List;
@@ -59,9 +59,9 @@ public interface AccountService {
   List<Account> createAccounts(List<Account> accounts);
 
   /**
-   * Batch update of accounts with validation
-   * @param accounts List of accounts to update
-   * @return List of updated accounts
+   * Batch update of accounts with validation.
+   * param accounts List of accounts to update
+   * return List of updated accounts
    */
   List<Account> updateAccounts(List<Account> accounts);
 

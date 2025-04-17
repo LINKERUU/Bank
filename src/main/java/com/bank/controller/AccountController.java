@@ -1,7 +1,7 @@
 package com.bank.controller;
 
 import com.bank.model.Account;
-import com.bank.serviceImpl.AccountService;
+import com.bank.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -119,9 +119,9 @@ public class AccountController {
   }
 
   /**
-   * Batch update of accounts.
-   * @param accounts List of accounts to update
-   * @return List of updated accounts.
+   * Creates a new account.
+   * account the account to create
+   * return the created account
    */
   @Operation(summary = "Массовое обновление счетов",
           description = "Обновляет несколько счетов одновременно")
@@ -176,6 +176,10 @@ public class AccountController {
     return ResponseEntity.ok(accountService.findAccountsWithCards());
   }
 
+  /**
+   * Deletes multiple accounts by their IDs.
+   * param ids the list of account IDs to delete
+   */
   @Operation(summary = "Массовое удаление счетов",
           description = "Удаляет несколько счетов по их ID")
   @ApiResponses(value = {

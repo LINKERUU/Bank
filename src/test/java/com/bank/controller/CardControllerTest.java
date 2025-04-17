@@ -3,7 +3,7 @@ package com.bank.controller;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Card;
-import com.bank.serviceImpl.CardService;
+import com.bank.service.CardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

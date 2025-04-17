@@ -1,9 +1,9 @@
-package com.bank.serviceImpl;
+package com.bank.service;
 
 import com.bank.exception.ValidationException;
 import com.bank.model.Card;
 import com.bank.repository.CardRepository;
-import com.bank.serviceImpl.impl.CardServiceImpl;
+import com.bank.service.impl.CardServiceImpl;
 import com.bank.utils.InMemoryCache;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

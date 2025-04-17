@@ -59,12 +59,31 @@ public class CardServiceImpl implements CardService {
   }
 
   @Override
-  @Transactional
   public Card createCard(Card card) {
-    validateCard(card);
+    // Валидация номера карты
+    if (card.getCardNumber() == null || card.getCardNumber().length() != 16) {
+      throw new ValidationException("Card number must be 16 digits");
+    }
+
+    // Дополнительные проверки
+    validateExpirationDate(card);
+    validateCVV(card);
+
     Card savedCard = cardRepository.save(card);
     cardCache.put(savedCard.getId(), savedCard);
     return savedCard;
+  }
+
+  private void validateExpirationDate(Card card) {
+    if (card.getExpirationDate() == null || card.getExpirationDate().isBefore(YearMonth.now())) {
+      throw new ValidationException("Invalid expiration date");
+    }
+  }
+
+  private void validateCVV(Card card) {
+    if (card.getCvv() == null || card.getCvv().length() < 3 || card.getCvv().length() > 4) {
+      throw new ValidationException("CVV must be 3 or 4 digits");
+    }
   }
 
   @Override

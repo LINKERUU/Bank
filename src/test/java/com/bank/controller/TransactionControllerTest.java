@@ -68,11 +68,10 @@ class TransactionControllerTest {
     when(transactionService.findTransactionById(1L)).thenReturn(Optional.of(transaction1));
 
     // Act
-    var response = transactionController.getTransactionById(1L);
+    Transaction response = transactionController.getTransactionById(1L);
 
     // Assert
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(1L, response.getBody().getId());
+    assertEquals(1L, response.getId()); // Проверяем только тело
     verify(transactionService, times(1)).findTransactionById(1L);
   }
 

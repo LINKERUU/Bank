@@ -1,227 +1,204 @@
 package com.bank.controller;
 
 import com.bank.exception.ResourceNotFoundException;
+import com.bank.exception.ValidationException;
 import com.bank.model.Card;
 import com.bank.serviceImpl.CardService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import java.time.YearMonth;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class CardControllerTest {
 
-  private MockMvc mockMvc;
-  private final ObjectMapper objectMapper = new ObjectMapper();
-
   @Mock
   private CardService cardService;
+
+  @Mock
+  private BindingResult bindingResult;
 
   @InjectMocks
   private CardController cardController;
 
+  private Card validCard;
+  private Card invalidCard;
+
   @BeforeEach
   void setUp() {
-    mockMvc = MockMvcBuilders.standaloneSetup(cardController).build();
-  }
+    validCard = new Card();
+    validCard.setId(1L);
+    validCard.setCardNumber("1234567890123456");
+    validCard.setExpirationDate(YearMonth.now().plusYears(2));
+    validCard.setCvv("123");
 
-  private Card createTestCard(Long id, String number, YearMonth expDate, String cvv) {
-    Card card = new Card();
-    card.setId(id);
-    card.setCardNumber(number);
-    card.setExpirationDate(expDate);
-    card.setCvv(cvv);
-    return card;
-  }
-
-  // Unit tests
-  @Test
-  void findAllCards_ShouldReturnAllCards() throws Exception {
-    Card card = createTestCard(1L, "1234567890123456", YearMonth.now().plusYears(1), "123");
-    when(cardService.findAllCards()).thenReturn(List.of(card));
-
-    mockMvc.perform(get("/api/cards"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].cardNumber").value("1234567890123456"));
-
-    verify(cardService).findAllCards();
+    invalidCard = new Card();
+    invalidCard.setId(2L);
+    invalidCard.setCardNumber("invalid");
+    invalidCard.setExpirationDate(YearMonth.now().minusMonths(1));
+    invalidCard.setCvv("1");
   }
 
   @Test
-  void findCardById_ShouldReturnCard() throws Exception {
-    Card card = createTestCard(1L, "1234567890123456", YearMonth.now().plusYears(1), "123");
-    when(cardService.findCardById(1L)).thenReturn(Optional.of(card));
+  void findAllCards_ShouldReturnAllCards() {
+    // Arrange
+    List<Card> expectedCards = Arrays.asList(validCard, new Card());
+    when(cardService.findAllCards()).thenReturn(expectedCards);
 
-    mockMvc.perform(get("/api/cards/1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.cvv").value("123"));
+    // Act
+    List<Card> actualCards = cardController.findAllCards();
 
-    verify(cardService).findCardById(1L);
+    // Assert
+    assertEquals(expectedCards.size(), actualCards.size());
+    verify(cardService, times(1)).findAllCards();
   }
 
   @Test
-  void findCardById_ShouldReturnNotFound() throws Exception {
-    when(cardService.findCardById(1L)).thenReturn(Optional.empty());
+  void getCardById_WhenCardExists_ShouldReturnCard() {
+    // Arrange
+    when(cardService.findCardById(1L)).thenReturn(Optional.of(validCard));
 
-    mockMvc.perform(get("/api/cards/1"))
-            .andExpect(status().isNotFound());
+    // Act
+    ResponseEntity<Card> response = cardController.getCardById(1L);
 
-    verify(cardService).findCardById(1L);
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(validCard, response.getBody());
   }
 
   @Test
-  void createCard_ShouldReturnCreatedResponse() throws Exception {
-    Card card = createTestCard(null, "1234567890123456", YearMonth.now().plusYears(1), "123");
-    Card savedCard = createTestCard(1L, "1234567890123456", YearMonth.now().plusYears(1), "123");
+  void getCardById_WhenCardNotExists_ShouldReturnNotFound() {
+    // Arrange
+    when(cardService.findCardById(anyLong())).thenReturn(Optional.empty());
 
-    when(cardService.createCard(any(Card.class))).thenReturn(savedCard);
+    // Act
+    ResponseEntity<Card> response = cardController.getCardById(99L);
 
-    mockMvc.perform(post("/api/cards")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(card)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.cardNumber").value("1234567890123456"));
-
-    verify(cardService).createCard(any(Card.class));
+    // Assert
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertNull(response.getBody());
   }
 
   @Test
-  void createCard_ShouldValidateInput() throws Exception {
-    Card invalidCard = createTestCard(null, "1234", YearMonth.now().plusYears(1), "123");
+  void createCard_WithValidCard_ShouldReturnCreated() {
+    // Arrange
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(cardService.createCard(validCard)).thenReturn(validCard);
 
-    mockMvc.perform(post("/api/cards")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(invalidCard)))
-            .andExpect(status().isBadRequest());
+    // Act
+    ResponseEntity<?> response = cardController.createCard(validCard, bindingResult);
 
-    verifyNoInteractions(cardService);
+    // Assert
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertEquals(validCard, response.getBody());
   }
 
   @Test
-  void createCards_ShouldReturnCreatedCards() throws Exception {
-    Card card1 = createTestCard(null, "1111222233334444", YearMonth.now().plusYears(1), "111");
-    Card card2 = createTestCard(null, "5555666677778888", YearMonth.now().plusYears(2), "222");
-    List<Card> cards = List.of(card1, card2);
+  void createCard_WithInvalidCard_ShouldReturnBadRequest() {
+    // Arrange
+    when(bindingResult.hasErrors()).thenReturn(true);
+    FieldError fieldError = new FieldError("card", "cardNumber", "Invalid card number");
+    when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(fieldError));
 
-    when(cardService.createCards(anyList())).thenReturn(cards);
+    // Act
+    ResponseEntity<?> response = cardController.createCard(invalidCard, bindingResult);
 
-    mockMvc.perform(post("/api/cards/batch")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(cards)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$[0].cardNumber").value("1111222233334444"))
-            .andExpect(jsonPath("$[1].cardNumber").value("5555666677778888"));
-
-    verify(cardService).createCards(anyList());
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertInstanceOf(Map.class, response.getBody());
+    Map<?, ?> body = (Map<?, ?>) response.getBody();
+    assertTrue(body.containsKey("errors"));
+    verify(cardService, never()).createCard(any());
   }
 
   @Test
-  void updateCard_ShouldReturnUpdatedCard() throws Exception {
-    Card updates = createTestCard(1L, null, YearMonth.now().plusYears(2), "999");
-    Card updated = createTestCard(1L, "1234567890123456", YearMonth.now().plusYears(2), "999");
+  void createCard_WithServiceValidationException_ShouldPropagateException() {
+    // Arrange
+    when(bindingResult.hasErrors()).thenReturn(false);
+    when(cardService.createCard(validCard)).thenThrow(new ValidationException("Validation failed"));
 
-    when(cardService.updateCard(anyLong(), any(Card.class))).thenReturn(updated);
-
-    mockMvc.perform(put("/api/cards/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(updates)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.cvv").value("999"))
-            .andExpect(jsonPath("$.expirationDate").exists());
-
-    verify(cardService).updateCard(anyLong(), any(Card.class));
+    // Act & Assert
+    assertThrows(ValidationException.class, () -> cardController.createCard(validCard, bindingResult));
   }
 
   @Test
-  void updateCard_ShouldHandleNotFound() throws Exception {
-    Card updates = createTestCard(1L, null, YearMonth.now().plusYears(2), "999");
+  void createCards_ShouldReturnCreatedCards() {
+    // Arrange
+    List<Card> cardsToCreate = Arrays.asList(validCard, validCard);
+    when(cardService.createCards(cardsToCreate)).thenReturn(cardsToCreate);
 
-    when(cardService.updateCard(anyLong(), any(Card.class)))
-            .thenThrow(new ResourceNotFoundException("Card not found"));
+    // Act
+    List<Card> createdCards = cardController.createCards(cardsToCreate);
 
-    mockMvc.perform(put("/api/cards/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(updates)))
-            .andExpect(status().isNotFound());
-
-    verify(cardService).updateCard(anyLong(), any(Card.class));
+    // Assert
+    assertEquals(cardsToCreate.size(), createdCards.size());
+    verify(cardService, times(1)).createCards(cardsToCreate);
   }
 
   @Test
-  void deleteCard_ShouldReturnNoContent() throws Exception {
-    doNothing().when(cardService).deleteCard(1L);
+  void updateCard_WithValidData_ShouldReturnUpdatedCard() {
+    // Arrange
+    when(cardService.updateCard(1L, validCard)).thenReturn(validCard);
 
-    mockMvc.perform(delete("/api/cards/1"))
-            .andExpect(status().isNoContent());
+    // Act
+    ResponseEntity<Card> response = cardController.updateCard(1L, validCard);
 
-    verify(cardService).deleteCard(1L);
-  }
-
-  // Validation tests
-  @Test
-  void shouldRejectInvalidCardNumber() throws Exception {
-    String invalidCardJson = """
-        {
-            "cardNumber": "1234",
-            "expirationDate": "2030-12",
-            "cvv": "123"
-        }
-        """;
-
-    mockMvc.perform(post("/api/cards")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(invalidCardJson))
-            .andExpect(status().isBadRequest());
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(validCard, response.getBody());
   }
 
   @Test
-  void shouldRejectExpiredCard() throws Exception {
-    String expiredCardJson = """
-        {
-            "cardNumber": "1234567890123456",
-            "expirationDate": "2020-01",
-            "cvv": "123"
-        }
-        """;
+  void updateCard_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+    // Arrange
+    when(cardService.updateCard(anyLong(), any())).thenThrow(new ResourceNotFoundException("Card not found"));
 
-    mockMvc.perform(post("/api/cards")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(expiredCardJson))
-            .andExpect(status().isBadRequest());
+    // Act & Assert
+    assertThrows(ResourceNotFoundException.class, () -> cardController.updateCard(99L, validCard));
   }
 
   @Test
-  void shouldRejectInvalidCvv() throws Exception {
-    String invalidCvvJson = """
-        {
-            "cardNumber": "1234567890123456",
-            "expirationDate": "2030-12",
-            "cvv": "12"
-        }
-        """;
+  void updateCard_WithInvalidData_ShouldThrowIllegalArgumentException() {
+    // Arrange
+    when(cardService.updateCard(anyLong(), any())).thenThrow(new IllegalArgumentException("Invalid data"));
 
-    mockMvc.perform(post("/api/cards")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(invalidCvvJson))
-            .andExpect(status().isBadRequest());
+    // Act & Assert
+    assertThrows(IllegalArgumentException.class, () -> cardController.updateCard(1L, invalidCard));
+  }
+
+  @Test
+  void deleteCard_WithExistingId_ShouldCallService() {
+    // Act
+    cardController.deleteCard(1L);
+
+    // Assert
+    verify(cardService, times(1)).deleteCard(1L);
+  }
+
+  @Test
+  void deleteCard_WithNonExistingId_ShouldThrowResourceNotFoundException() {
+    // Arrange
+    doThrow(new ResourceNotFoundException("Card not found")).when(cardService).deleteCard(anyLong());
+
+    // Act & Assert
+    assertThrows(ResourceNotFoundException.class, () -> cardController.deleteCard(99L));
   }
 }

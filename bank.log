@@ -310,3 +310,403 @@
 2025-04-17T00:39:49.846+03:00  INFO 41764 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-04-17T00:39:49.853+03:00  INFO 41764 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2025-04-17T00:39:49.861+03:00  INFO 41764 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T00:54:37.998+03:00  INFO 42764 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 42764 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T00:54:37.999+03:00 DEBUG 42764 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T00:54:38.000+03:00  INFO 42764 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T00:54:38.989+03:00  INFO 42764 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T00:54:39.054+03:00  INFO 42764 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 4 JPA repository interfaces.
+2025-04-17T00:54:39.900+03:00  INFO 42764 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T00:54:39.999+03:00  INFO 42764 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T00:54:40.052+03:00  INFO 42764 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T00:54:40.518+03:00  INFO 42764 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T00:54:40.557+03:00  INFO 42764 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T00:54:40.836+03:00  INFO 42764 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2e826bd1
+2025-04-17T00:54:40.839+03:00  INFO 42764 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T00:54:40.900+03:00  WARN 42764 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T00:54:40.940+03:00  INFO 42764 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T00:54:42.176+03:00  INFO 42764 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T00:54:42.401+03:00  INFO 42764 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T00:54:42.825+03:00  INFO 42764 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T00:54:44.025+03:00  WARN 42764 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T00:54:44.106+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:44.833+03:00  INFO 42764 --- [Bank] [main] com.bank.BankApplicationTests            : Started BankApplicationTests in 7.211 seconds (process running for 9.081)
+2025-04-17T00:54:45.482+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.494+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.494+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.495+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2025-04-17T00:54:45.560+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.566+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.566+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.566+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.575+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.578+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.578+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.578+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.584+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.589+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.590+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.590+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.678+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.681+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.682+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.682+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.685+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.689+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.689+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.689+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.701+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.705+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.705+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.705+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.719+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.723+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.723+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.723+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.758+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.761+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.761+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.762+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.772+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.775+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.775+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.775+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:45.783+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.786+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.786+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.787+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2025-04-17T00:54:45.790+03:00  INFO 42764 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T00:54:45.792+03:00  INFO 42764 --- [Bank] [main] o.s.mock.web.MockServletContext          : Initializing Spring TestDispatcherServlet ''
+2025-04-17T00:54:45.793+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2025-04-17T00:54:45.793+03:00  INFO 42764 --- [Bank] [main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2025-04-17T00:54:46.602+03:00  INFO 42764 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T00:54:46.607+03:00  INFO 42764 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T00:54:46.620+03:00  INFO 42764 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T16:38:44.677+03:00  INFO 40480 --- [Bank] [main] com.bank.BankApplication                 : Starting BankApplication using Java 23.0.2 with PID 40480 (D:\Coding\Java\Bank\target\classes started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T16:38:44.678+03:00 DEBUG 40480 --- [Bank] [main] com.bank.BankApplication                 : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T16:38:44.679+03:00  INFO 40480 --- [Bank] [main] com.bank.BankApplication                 : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T16:38:45.280+03:00  INFO 40480 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T16:38:45.327+03:00  INFO 40480 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 39 ms. Found 4 JPA repository interfaces.
+2025-04-17T16:38:45.821+03:00  INFO 40480 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-04-17T16:38:45.831+03:00  INFO 40480 --- [Bank] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-04-17T16:38:45.831+03:00  INFO 40480 --- [Bank] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-04-17T16:38:45.870+03:00  INFO 40480 --- [Bank] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-04-17T16:38:45.870+03:00  INFO 40480 --- [Bank] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1154 ms
+2025-04-17T16:38:46.015+03:00  INFO 40480 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T16:38:46.085+03:00  INFO 40480 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T16:38:46.116+03:00  INFO 40480 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T16:38:46.298+03:00  INFO 40480 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T16:38:46.321+03:00  INFO 40480 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T16:38:46.475+03:00  INFO 40480 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@b70fa38
+2025-04-17T16:38:46.476+03:00  INFO 40480 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T16:38:46.524+03:00  WARN 40480 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T16:38:46.540+03:00  INFO 40480 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T16:38:47.252+03:00  INFO 40480 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T16:38:47.529+03:00  INFO 40480 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T16:38:47.759+03:00  INFO 40480 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T16:38:48.314+03:00  WARN 40480 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T16:38:48.351+03:00  INFO 40480 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T16:38:48.724+03:00  INFO 40480 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-04-17T16:38:48.730+03:00  INFO 40480 --- [Bank] [main] com.bank.BankApplication                 : Started BankApplication in 4.468 seconds (process running for 4.943)
+2025-04-17T16:38:51.083+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-04-17T16:38:51.083+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-04-17T16:38:51.084+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-04-17T16:38:51.159+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-3] com.bank.aspect.LoggingAspect            : Executing method: CardController.createCard(..)
+2025-04-17T16:38:51.160+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-3] com.bank.aspect.LoggingAspect            : Error in method: CardController.createCard(..). Error: Card number must be 16 digits
+2025-04-17T16:38:51.161+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-3] c.bank.exception.GlobalExceptionHandler  : Validation error: Card number must be 16 digits
+2025-04-17T16:39:37.340+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-9] com.bank.aspect.LoggingAspect            : Executing method: CardController.createCard(..)
+2025-04-17T16:39:37.340+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-9] com.bank.aspect.LoggingAspect            : Error in method: CardController.createCard(..). Error: Card number must be 16 digits
+2025-04-17T16:39:37.341+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-9] c.bank.exception.GlobalExceptionHandler  : Validation error: Card number must be 16 digits
+2025-04-17T16:39:39.459+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-5] com.bank.aspect.LoggingAspect            : Executing method: CardController.createCard(..)
+2025-04-17T16:39:39.459+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-5] com.bank.aspect.LoggingAspect            : Error in method: CardController.createCard(..). Error: Card number must be 16 digits
+2025-04-17T16:39:39.460+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-5] c.bank.exception.GlobalExceptionHandler  : Validation error: Card number must be 16 digits
+2025-04-17T16:39:40.240+03:00  INFO 40480 --- [Bank] [http-nio-8080-exec-4] com.bank.aspect.LoggingAspect            : Executing method: CardController.createCard(..)
+2025-04-17T16:39:40.240+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-4] com.bank.aspect.LoggingAspect            : Error in method: CardController.createCard(..). Error: Card number must be 16 digits
+2025-04-17T16:39:40.241+03:00 ERROR 40480 --- [Bank] [http-nio-8080-exec-4] c.bank.exception.GlobalExceptionHandler  : Validation error: Card number must be 16 digits
+2025-04-17T16:39:49.367+03:00  INFO 40480 --- [Bank] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-17T16:39:49.372+03:00  INFO 40480 --- [Bank] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-04-17T16:39:49.375+03:00  INFO 40480 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T16:39:49.377+03:00  INFO 40480 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T16:39:49.379+03:00  INFO 40480 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T20:57:13.961+03:00  INFO 12872 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 12872 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T20:57:13.963+03:00 DEBUG 12872 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T20:57:13.963+03:00  INFO 12872 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T20:57:15.050+03:00  INFO 12872 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T20:57:15.132+03:00  INFO 12872 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 65 ms. Found 4 JPA repository interfaces.
+2025-04-17T20:57:15.976+03:00  INFO 12872 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T20:57:16.075+03:00  INFO 12872 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T20:57:16.142+03:00  INFO 12872 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T20:57:16.565+03:00  INFO 12872 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T20:57:16.608+03:00  INFO 12872 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T20:57:16.969+03:00  INFO 12872 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2a28bf25
+2025-04-17T20:57:16.978+03:00  INFO 12872 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T20:57:17.036+03:00  WARN 12872 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T20:57:17.070+03:00  INFO 12872 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T20:57:18.353+03:00  INFO 12872 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T20:57:18.611+03:00  INFO 12872 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T20:57:19.119+03:00  INFO 12872 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T20:57:20.013+03:00  WARN 12872 --- [Bank] [main] o.s.w.c.s.GenericWebApplicationContext   : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cardController' defined in file [D:\Coding\Java\Bank\target\classes\com\bank\controller\CardController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'cardServiceImpl' defined in file [D:\Coding\Java\Bank\target\classes\com\bank\serviceImpl\impl\CardServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: No qualifying bean of type 'jakarta.validation.Validator' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2025-04-17T20:57:20.013+03:00  INFO 12872 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T20:57:20.018+03:00  INFO 12872 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T20:57:20.028+03:00  INFO 12872 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T20:57:20.046+03:00  INFO 12872 --- [Bank] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-04-17T20:57:20.090+03:00 ERROR 12872 --- [Bank] [main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 2 of constructor in com.bank.serviceImpl.impl.CardServiceImpl required a bean of type 'jakarta.validation.Validator' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'jakarta.validation.Validator' in your configuration.
+
+2025-04-17T20:57:20.094+03:00  WARN 12872 --- [Bank] [main] o.s.test.context.TestContextManager      : Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [com.bank.BankApplicationTests@1e53fdd9]
+
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@1cb50ab1 testClass = com.bank.BankApplicationTests, locations = [], classes = [com.bank.BankApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@777c350f, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@160396db, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@5d235104, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@6272c96f, org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@48c4245d, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@677b8e13, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@2cedfd46], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:191) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:130) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:215) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:215) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1709) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:570) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:560) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:265) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:636) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.2.jar:3.5.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.2.jar:3.5.2]
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cardController' defined in file [D:\Coding\Java\Bank\target\classes\com\bank\controller\CardController.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'cardServiceImpl' defined in file [D:\Coding\Java\Bank\target\classes\com\bank\serviceImpl\impl\CardServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: No qualifying bean of type 'jakarta.validation.Validator' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:307) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1122) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1093) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1030) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:987) ~[spring-context-6.2.2.jar:6.2.2]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.2.jar:6.2.2]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752) ~[spring-boot-3.4.2.jar:3.4.2]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.2.jar:3.4.2]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.2.jar:3.4.2]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.2.jar:3.4.2]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.2.jar:6.2.2]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.2.jar:6.2.2]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461) ~[spring-boot-3.4.2.jar:3.4.2]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553) ~[spring-boot-test-3.4.2.jar:3.4.2]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137) ~[spring-boot-test-3.4.2.jar:3.4.2]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108) ~[spring-boot-test-3.4.2.jar:3.4.2]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.2.jar:6.2.2]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.2.jar:6.2.2]
+	... 75 common frames omitted
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'cardServiceImpl' defined in file [D:\Coding\Java\Bank\target\classes\com\bank\serviceImpl\impl\CardServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: No qualifying bean of type 'jakarta.validation.Validator' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1381) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1218) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:307) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1631) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1519) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.2.jar:6.2.2]
+	... 101 common frames omitted
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'jakarta.validation.Validator' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:2144) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1594) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1519) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913) ~[spring-beans-6.2.2.jar:6.2.2]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.2.2.jar:6.2.2]
+	... 115 common frames omitted
+
+2025-04-17T21:05:18.385+03:00  INFO 33828 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 33828 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T21:05:18.387+03:00 DEBUG 33828 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T21:05:18.388+03:00  INFO 33828 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T21:05:19.407+03:00  INFO 33828 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T21:05:19.475+03:00  INFO 33828 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 56 ms. Found 4 JPA repository interfaces.
+2025-04-17T21:05:20.301+03:00  INFO 33828 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T21:05:20.395+03:00  INFO 33828 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T21:05:20.436+03:00  INFO 33828 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T21:05:20.852+03:00  INFO 33828 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T21:05:20.886+03:00  INFO 33828 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T21:05:21.196+03:00  INFO 33828 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@25102e0
+2025-04-17T21:05:21.199+03:00  INFO 33828 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T21:05:21.256+03:00  WARN 33828 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T21:05:21.298+03:00  INFO 33828 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T21:05:22.560+03:00  INFO 33828 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T21:05:22.788+03:00  INFO 33828 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:05:23.207+03:00  INFO 33828 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T21:05:24.525+03:00  WARN 33828 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T21:05:24.614+03:00  INFO 33828 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T21:05:25.449+03:00  INFO 33828 --- [Bank] [main] com.bank.BankApplicationTests            : Started BankApplicationTests in 7.427 seconds (process running for 9.453)
+2025-04-17T21:05:27.285+03:00  INFO 33828 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:05:27.292+03:00  INFO 33828 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T21:05:27.304+03:00  INFO 33828 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T21:07:10.932+03:00  INFO 34052 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 34052 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T21:07:10.933+03:00 DEBUG 34052 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T21:07:10.934+03:00  INFO 34052 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T21:07:11.559+03:00  INFO 34052 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T21:07:11.615+03:00  INFO 34052 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 47 ms. Found 4 JPA repository interfaces.
+2025-04-17T21:07:12.159+03:00  INFO 34052 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T21:07:12.209+03:00  INFO 34052 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T21:07:12.238+03:00  INFO 34052 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T21:07:12.526+03:00  INFO 34052 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T21:07:12.553+03:00  INFO 34052 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T21:07:12.699+03:00  INFO 34052 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@42b4df5a
+2025-04-17T21:07:12.701+03:00  INFO 34052 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T21:07:12.732+03:00  WARN 34052 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T21:07:12.747+03:00  INFO 34052 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T21:07:13.499+03:00  INFO 34052 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T21:07:13.700+03:00  INFO 34052 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:07:14.141+03:00  INFO 34052 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T21:07:15.265+03:00  WARN 34052 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T21:07:15.331+03:00  INFO 34052 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T21:07:16.027+03:00  INFO 34052 --- [Bank] [main] com.bank.BankApplicationTests            : Started BankApplicationTests in 5.379 seconds (process running for 6.233)
+2025-04-17T21:07:16.454+03:00  INFO 34052 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:07:16.458+03:00  INFO 34052 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T21:07:16.463+03:00  INFO 34052 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-04-17T21:10:25.238+03:00  INFO 38672 --- [Bank] [main] com.bank.BankApplicationTests            : Starting BankApplicationTests using Java 23.0.2 with PID 38672 (started by SAFA in D:\Coding\Java\Bank)
+2025-04-17T21:10:25.240+03:00 DEBUG 38672 --- [Bank] [main] com.bank.BankApplicationTests            : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-04-17T21:10:25.241+03:00  INFO 38672 --- [Bank] [main] com.bank.BankApplicationTests            : No active profile set, falling back to 1 default profile: "default"
+2025-04-17T21:10:26.274+03:00  INFO 38672 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-17T21:10:26.349+03:00  INFO 38672 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 64 ms. Found 4 JPA repository interfaces.
+2025-04-17T21:10:27.247+03:00  INFO 38672 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-17T21:10:27.327+03:00  INFO 38672 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-17T21:10:27.366+03:00  INFO 38672 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-04-17T21:10:27.821+03:00  INFO 38672 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-17T21:10:27.858+03:00  INFO 38672 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-04-17T21:10:28.156+03:00  INFO 38672 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@35a7c477
+2025-04-17T21:10:28.159+03:00  INFO 38672 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-04-17T21:10:28.207+03:00  WARN 38672 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-17T21:10:28.237+03:00  INFO 38672 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-17T21:10:29.502+03:00  INFO 38672 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-17T21:10:29.733+03:00  INFO 38672 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:10:30.238+03:00  INFO 38672 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-17T21:10:31.549+03:00  WARN 38672 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-17T21:10:31.638+03:00  INFO 38672 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-04-17T21:10:32.420+03:00  INFO 38672 --- [Bank] [main] com.bank.BankApplicationTests            : Started BankApplicationTests in 7.571 seconds (process running for 9.437)
+2025-04-17T21:10:34.049+03:00  INFO 38672 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-17T21:10:34.054+03:00  INFO 38672 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-04-17T21:10:34.062+03:00  INFO 38672 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

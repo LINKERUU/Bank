@@ -53,15 +53,17 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Transactional(readOnly = true)
   public Optional<User> findUserById(Long id) {
+    // 1. Проверка кэша
     User cachedUser = userCache.get(id);
     if (cachedUser != null) {
-      return Optional.of(cachedUser);
+      return Optional.of(cachedUser); // Возвращаем из кэша
     }
 
+    // 2. Если нет в кэше, ищем в репозитории
     Optional<User> user = userRepository.findById(id);
-    user.ifPresent(u -> userCache.put(id, u));
+    user.ifPresent(u -> userCache.put(id, u)); // Кэшируем найденного пользователя
+
     return user;
   }
 
@@ -118,11 +120,11 @@ public class UserServiceImpl implements UserService {
       throw new ValidationException("Password is required");
     }
 
-    if (userRepository.existsById(Long.valueOf(user.getEmail()))) {
+    if (userRepository.existsByEmail(user.getEmail())) {
       throw new ValidationException("User with this email already exists");
     }
 
-    if (userRepository.existsById(Long.valueOf(user.getPhone()))) {
+    if (userRepository.existsByPhone(user.getPhone())) {
       throw new ValidationException("User with this phone already exists");
     }
 
@@ -132,13 +134,13 @@ public class UserServiceImpl implements UserService {
   private void validateUserForUpdate(User updatedUser, User existingUser) {
     if (updatedUser.getEmail() != null
             && !updatedUser.getEmail().equals(existingUser.getEmail())
-            && userRepository.existsById(Long.valueOf(updatedUser.getEmail()))) {
+            && userRepository.existsByEmail(updatedUser.getEmail())) {  // Changed from existsById
       throw new ValidationException("User with this email already exists");
     }
 
     if (updatedUser.getPhone() != null
             && !updatedUser.getPhone().equals(existingUser.getPhone())
-            && userRepository.existsById(Long.valueOf(updatedUser.getPhone()))) {
+            && userRepository.existsByPhone(updatedUser.getPhone())) {  // Changed from existsById
       throw new ValidationException("User with this phone already exists");
     }
 

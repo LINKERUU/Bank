@@ -72,23 +72,14 @@ public class AccountServiceImpl implements AccountService {
   }
 
   @Override
-  @Transactional
   public Account createAccount(Account account) {
-    // Валидация данных
-    if (account.getAccountNumber() == null || account.getAccountNumber().length() < 10
-            || account.getAccountNumber().length() > 20) {
-      throw new ValidationException("The account number must"
-              + " be between 10 and 20 characters long.");
-    }
-    if (!account.getAccountNumber().matches("^[0-9]+$")) {
-      throw new ValidationException("The account number must contain only numbers.");
-    }
-    if (account.getBalance() == null || account.getBalance() < 0) {
-      throw new ValidationException("The balance cannot be negative");
-    }
+    // Валидация
     if (account.getUsers() == null || account.getUsers().isEmpty()) {
-      throw new ValidationException("The account must be linked to at least one user.");
+      throw new ValidationException("The account must be linked to at least one user");
     }
+
+    // Другие проверки...
+    validateAccount(account);
 
     Account savedAccount = accountRepository.save(account);
     accountCache.put(savedAccount.getId(), savedAccount);
@@ -98,11 +89,14 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public List<Account> createAccounts(List<Account> accounts) {
-    // Валидация всех счетов перед сохранением
+    // Validate all accounts
     List<String> validationErrors = accounts.stream()
             .map(account -> {
               try {
                 validateAccount(account);
+                if (account.getUsers() == null || account.getUsers().isEmpty()) {
+                  return "Account " + account.getAccountNumber() + ": must be linked to at least one user";
+                }
                 return null;
               } catch (ValidationException e) {
                 return "Account " + account.getAccountNumber() + ": " + e.getMessage();
@@ -116,11 +110,9 @@ public class AccountServiceImpl implements AccountService {
               String.join("\n", validationErrors));
     }
 
-    // Сохранение и кэширование
-    return accounts.stream()
-            .map(accountRepository::save)
-            .peek(account -> accountCache.put(account.getId(), account))
-            .collect(Collectors.toList());
+    List<Account> savedAccounts = accountRepository.saveAll(accounts);
+    savedAccounts.forEach(account -> accountCache.put(account.getId(), account));
+    return savedAccounts;
   }
 
   private void validateAccount(Account account) {
@@ -188,25 +180,25 @@ public class AccountServiceImpl implements AccountService {
   @Override
   @Transactional
   public List<Account> updateAccounts(List<Account> accounts) {
-    return accounts.stream()
-            .peek(account -> {
-              if (account.getId() == null) {
-                throw new ValidationException("Account ID cannot be null for update");
-              }
-            })
-            .map(account -> {
-              Account existing = accountRepository.findById(account.getId())
-                      .orElseThrow(() -> new ResourceNotFoundException(
-                              "Account not found with id: " + account.getId()));
+    // Validate input
+    if (accounts == null) {
+      throw new ValidationException("Accounts list cannot be null");
+    }
 
-              // Обновляем только разрешенные поля
-              if (account.getBalance() != null) {
-                existing.setBalance(account.getBalance());
-              }
-              return existing;
-            })
-            .map(accountRepository::save)
-            .peek(account -> accountCache.put(account.getId(), account))
-            .collect(Collectors.toList());
+    // Check for null accounts
+    if (accounts.stream().anyMatch(Objects::isNull)) {
+      throw new ValidationException("Account list contains null elements");
+    }
+
+    // Validate each account
+    accounts.forEach(this::validateAccount);
+
+    List<Account> updatedAccounts = accountRepository.saveAll(accounts);
+
+    // Cache the updated accounts
+    updatedAccounts.forEach(account ->
+            accountCache.put(account.getId(), account));
+
+    return updatedAccounts;
   }
 }

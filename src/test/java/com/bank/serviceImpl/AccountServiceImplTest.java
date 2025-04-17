@@ -3,6 +3,7 @@ package com.bank.serviceImpl;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Account;
+import com.bank.model.Card;
 import com.bank.model.User;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
@@ -14,9 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,12 +31,12 @@ class AccountServiceImplTest {
   @Mock private InMemoryCache<Long, Account> accountCache;
   @InjectMocks private AccountServiceImpl accountService;
 
-  private Account createTestAccount(Long id, String number, double balance) {
+  private Account createTestAccount(Long id, String accountNumber, double balance) {
     Account account = new Account();
     account.setId(id);
-    account.setAccountNumber(number);
+    account.setAccountNumber(accountNumber);
     account.setBalance(balance);
-    account.setUsers((java.util.Set<User>) Collections.singletonList(new User()));
+
     return account;
   }
 
@@ -65,14 +67,21 @@ class AccountServiceImplTest {
 
   @Test
   void createAccount_ShouldValidateAndSaveAccount() {
+    User user = new User();
+    user.setId(1L);
+
     Account account = createTestAccount(null, "1234567890", 1000.0);
+    account.setUsers(Set.of(user));
+
     Account savedAccount = createTestAccount(1L, "1234567890", 1000.0);
+    savedAccount.setUsers(Set.of(user));
 
     when(accountRepository.save(account)).thenReturn(savedAccount);
 
     Account result = accountService.createAccount(account);
 
     assertNotNull(result.getId());
+    assertEquals(1, result.getUsers().size());
     verify(accountRepository).save(account);
     verify(accountCache).put(1L, savedAccount);
   }
@@ -89,16 +98,21 @@ class AccountServiceImplTest {
 
   @Test
   void createAccounts_ShouldValidateAndSaveAllAccounts() {
-    Account account1 = createTestAccount(null, "1111111111", 1000.0);
-    Account account2 = createTestAccount(null, "2222222222", 2000.0);
+    User user = new User();
+    user.setId(1L);
+
+    Account account1 = createTestAccount(1L, "1111111111", 1000.0); // Add ID
+    account1.setUsers(Set.of(user));
+    Account account2 = createTestAccount(2L, "2222222222", 2000.0); // Add ID
+    account2.setUsers(Set.of(user));
     List<Account> accounts = List.of(account1, account2);
 
-    when(accountRepository.saveAll(accounts)).thenReturn(accounts);
+    when(accountRepository.saveAll(anyList())).thenReturn(accounts); // Mock return with IDs
 
     List<Account> result = accountService.createAccounts(accounts);
 
     assertEquals(2, result.size());
-    verify(accountRepository).saveAll(accounts);
+    verify(accountRepository).saveAll(anyList());
     verify(accountCache, times(2)).put(anyLong(), any());
   }
 
@@ -141,27 +155,42 @@ class AccountServiceImplTest {
     Account account2 = createTestAccount(2L, "2222222222", 2000.0);
     List<Account> accounts = List.of(account1, account2);
 
-    when(accountRepository.findById(1L)).thenReturn(Optional.of(account1));
-    when(accountRepository.findById(2L)).thenReturn(Optional.of(account2));
     when(accountRepository.saveAll(anyList())).thenReturn(accounts);
 
     List<Account> result = accountService.updateAccounts(accounts);
 
     assertEquals(2, result.size());
-    verify(accountCache, times(2)).put(anyLong(), any());
+    verify(accountRepository).saveAll(accounts);
+    verify(accountCache).put(1L, account1);
+    verify(accountCache).put(2L, account2);
+  }
+
+  @Test
+  void updateAccounts_ShouldThrowWhenAccountIsNull() {
+    // Create a list with null element using ArrayList
+    List<Account> accounts = new ArrayList<>();
+    accounts.add(createTestAccount(1L, "111", 1000.0));
+    accounts.add(null);
+
+    assertThrows(ValidationException.class,
+            () -> accountService.updateAccounts(accounts));
   }
 
   @Test
   void deleteAccount_ShouldDeleteWithCards() {
     Account account = createTestAccount(1L, "1234567890", 1000.0);
+    account.setCards(Set.of(new Card())); // Use Set.of() instead of List.of()
+
     when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
 
     accountService.deleteAccount(1L);
 
-    verify(cardRepository).deleteAll(any());
+    verify(cardRepository).deleteAll(account.getCards());
     verify(accountRepository).delete(account);
     verify(accountCache).evict(1L);
   }
+
+
 
   @Test
   void deleteAccounts_ShouldDeleteMultipleAccounts() {

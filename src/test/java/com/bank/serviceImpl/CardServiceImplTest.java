@@ -77,23 +77,26 @@ class CardServiceImplTest {
 
   @Test
   void createCard_ShouldThrowValidationExceptionForInvalidCardNumber() {
+    // Arrange
     Card invalidCard = createTestCard(null, "1234", YearMonth.now().plusYears(1), "123");
 
-    assertThrows(ValidationException.class, () -> cardService.createCard(invalidCard));
+    // Act & Assert
+    ValidationException exception = assertThrows(ValidationException.class,
+            () -> cardService.createCard(invalidCard));
+
+    // Проверяем стандартное сообщение валидации
+    assertEquals("Card number must be 16 digits", exception.getMessage());
+    verifyNoInteractions(cardRepository); // Убедимся, что сохранение не вызывалось
   }
 
   @Test
-  void createCards_ShouldValidateAndSaveAllCards() {
-    Card card1 = createTestCard(null, "1111222233334444", YearMonth.now().plusYears(1), "111");
-    Card card2 = createTestCard(null, "5555666677778888", YearMonth.now().plusYears(2), "222");
-    List<Card> cards = List.of(card1, card2);
+  void createCards_ShouldThrowWhenCardHasNoAccount() {
+    Card cardWithoutAccount = createTestCard(null, "1111222233334444", YearMonth.now().plusYears(1), "111");
 
-    when(cardRepository.saveAll(cards)).thenReturn(cards);
+    assertThrows(ValidationException.class,
+            () -> cardService.createCards(List.of(cardWithoutAccount)));
 
-    List<Card> result = cardService.createCards(cards);
-
-    assertEquals(2, result.size());
-    verify(cardCache, times(2)).put(anyLong(), any());
+    verifyNoInteractions(cardRepository, cardCache);
   }
 
   @Test

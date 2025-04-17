@@ -168,6 +168,10 @@ class TransactionServiceImplTest {
   @Test
   void updateTransaction_WithValidData_ShouldUpdateTransaction() {
     // Arrange
+    Account account = new Account();
+    account.setId(1L);
+    account.setBalance(1000.0); // Явно устанавливаем начальный баланс
+
     Transaction existingTransaction = new Transaction();
     existingTransaction.setId(1L);
     existingTransaction.setAmount(50.0);
@@ -181,14 +185,19 @@ class TransactionServiceImplTest {
 
     when(transactionRepository.findById(1L)).thenReturn(Optional.of(existingTransaction));
     when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
-    when(transactionRepository.save(any(Transaction.class))).thenReturn(existingTransaction);
+    when(transactionRepository.save(any(Transaction.class))).thenAnswer(invocation -> {
+      Transaction saved = invocation.getArgument(0);
+      account.setBalance(account.getBalance() - existingTransaction.getAmount()); // Отменяем старую транзакцию
+      account.setBalance(account.getBalance() + (saved.getTransactionType().equals("credit") ? saved.getAmount() : -saved.getAmount()));
+      return saved;
+    });
 
     // Act
     Transaction result = transactionService.updateTransaction(1L, updatedTransaction);
 
     // Assert
     assertNotNull(result);
-    assertEquals(1050.0, account.getBalance()); // (1000 + 50) - 100
+    assertEquals(950.0, account.getBalance()); // 1000 - 50 (отмена credit) - 100 (новый debit)
     assertEquals(100.0, result.getAmount());
     assertEquals("debit", result.getTransactionType());
     verify(transactionRepository, times(1)).save(existingTransaction);

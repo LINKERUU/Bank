@@ -8,9 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,10 +70,11 @@ public class CardController {
       @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @GetMapping("/{id}")
-  public Optional<Card> findCardById(@PathVariable Long id) {
-    return cardService.findCardById(id);
+  public ResponseEntity<Card> getCardById(@PathVariable Long id) {
+    return cardService.findCardById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
   }
-
   /**
    * Creates a new card.
    *
@@ -82,11 +86,20 @@ public class CardController {
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card) {
+  public ResponseEntity<?> createCard(@Valid @RequestBody Card card, BindingResult bindingResult) {
+
+    if (bindingResult.hasErrors()) {
+      List<String> errors = bindingResult.getFieldErrors()
+              .stream()
+              .map(FieldError::getDefaultMessage)
+              .toList();
+      return ResponseEntity.badRequest().body(Map.of("errors", errors));
+    }
+
     Card createdCard = cardService.createCard(card);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
   }
+
 
   /**
    * Creates multiple cards in a batch.

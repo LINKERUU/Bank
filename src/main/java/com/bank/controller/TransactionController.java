@@ -72,15 +72,12 @@ public class TransactionController {
       @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<Transaction> getTransactionById(@PathVariable Long id) {
-    try {
-      return transactionService.findTransactionById(id)
-              .map(ResponseEntity::ok)
-              .orElseThrow(() -> new ResponseStatusException(
-                      HttpStatus.NOT_FOUND, "Transaction not found with ID: " + id));
-    } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
+  public Transaction getTransactionById(@PathVariable Long id) {
+    return transactionService.findTransactionById(id)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Transaction not found with ID: " + id
+            ));
   }
 
   /**

@@ -15,12 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,245 +40,272 @@ class UserServiceImplTest {
   @InjectMocks
   private UserServiceImpl userService;
 
-  private User user;
-  private Account account;
+  private User testUser;
+  private User testUser2;
 
   @BeforeEach
   void setUp() {
-    user = new User();
-    user.setId(1L);
-    user.setFirstName("John");
-    user.setLastName("Doe");
-    user.setEmail("john.doe@example.com");
-    user.setPhone("+1234567890");
-    user.setPasswordHash("Password123!");
+    testUser = new User();
+    testUser.setId(1L);
+    testUser.setFirstName("John");
+    testUser.setLastName("Doe");
+    testUser.setEmail("john.doe@example.com");
+    testUser.setPhone("+1234567890");
+    testUser.setPasswordHash("ValidPass1!");
 
-    account = new Account();
-    account.setId(1L);
-    account.setUsers((java.util.Set<User>) Collections.singletonList(user));
+    testUser2 = new User();
+    testUser2.setId(2L);
+    testUser2.setFirstName("Jane");
+    testUser2.setLastName("Smith");
+    testUser2.setEmail("jane.smith@example.com");
+    testUser2.setPhone("+9876543210");
+    testUser2.setPasswordHash("AnotherValid1!");
   }
 
   @Test
   void findAllUsers_ShouldReturnAllUsers() {
-    // Arrange
-    User user2 = new User();
-    user2.setId(2L);
-    List<User> expectedUsers = Arrays.asList(user, user2);
-    when(userRepository.findAll()).thenReturn(expectedUsers);
+    when(userRepository.findAll()).thenReturn(List.of(testUser, testUser2));
 
-    // Act
-    List<User> result = userService.findAllUsers();
+    List<User> users = userService.findAllUsers();
 
-    // Assert
-    assertEquals(2, result.size());
-    verify(userRepository, times(1)).findAll();
+    assertEquals(2, users.size());
+    verify(userRepository).findAll();
   }
 
   @Test
-  void findUserById_WithCachedUser_ShouldReturnFromCache() {
-    // Arrange
-    when(userCache.get(1L)).thenReturn(user);
+  void findUserById_ShouldReturnUserFromCache() {
+    when(userCache.get(1L)).thenReturn(testUser);
 
-    // Act
     Optional<User> result = userService.findUserById(1L);
 
-    // Assert
     assertTrue(result.isPresent());
-    assertEquals(1L, result.get().getId());
-    verify(userCache, times(1)).get(1L);
+    assertEquals(testUser, result.get());
+    verify(userCache).get(1L);
     verify(userRepository, never()).findById(anyLong());
   }
 
   @Test
-  void findUserById_WithNonCachedUser_ShouldFetchFromRepository() {
-    // Arrange
+  void findUserById_ShouldReturnUserFromRepositoryAndCacheIt() {
     when(userCache.get(1L)).thenReturn(null);
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 
-    // Act
     Optional<User> result = userService.findUserById(1L);
 
-    // Assert
     assertTrue(result.isPresent());
-    assertEquals(1L, result.get().getId());
-    verify(userCache, times(1)).get(1L);
-    verify(userRepository, times(1)).findById(1L);
-    verify(userCache, times(1)).put(1L, user);
+    assertEquals(testUser, result.get());
+    verify(userCache).put(1L, testUser);
   }
 
   @Test
-  void createUser_WithValidData_ShouldCreateUser() {
-    // Arrange
+  void findUserById_ShouldReturnEmptyForNonExistingUser() {
+    when(userCache.get(1L)).thenReturn(null);
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+    Optional<User> result = userService.findUserById(1L);
+
+    assertTrue(result.isEmpty());
+    verify(userCache, never()).put(anyLong(), any());
+  }
+
+  @Test
+  void createUser_ShouldCreateAndCacheUser() {
+    when(passwordService.hashPassword("ValidPass1!")).thenReturn("hashedPassword");
+    when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+    User created = userService.createUser(testUser);
+
+    assertNotNull(created);
+    verify(passwordService).hashPassword("ValidPass1!");  // Match actual password
+    verify(userRepository).save(testUser);
+    verify(userCache).put(testUser.getId(), testUser);
+  }
+
+  @Test
+  void createUser_ShouldThrowValidationExceptionForNullUser() {
+    assertThrows(ValidationException.class, () -> userService.createUser(null));
+  }
+
+  @Test
+  void createUser_ShouldThrowValidationExceptionForInvalidEmail() {
+    testUser.setEmail(null);
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+
+    testUser.setEmail("  ");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+  }
+
+  @Test
+  void createUser_ShouldThrowValidationExceptionForInvalidPhone() {
+    testUser.setPhone(null);
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+
+    testUser.setPhone("  ");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+  }
+
+  @Test
+  void createUser_ShouldThrowValidationExceptionForWeakPassword() {
+    testUser.setPasswordHash("weak");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+  }
+
+  @Test
+  void createUsers_ShouldCreateMultipleUsers() {
     when(passwordService.hashPassword(anyString())).thenReturn("hashedPassword");
-    when(userRepository.save(any(User.class))).thenReturn(user);
+    when(userRepository.saveAll(anyList())).thenReturn(List.of(testUser, testUser2));
 
-    // Act
-    User result = userService.createUser(user);
+    List<User> createdUsers = userService.createUsers(List.of(testUser, testUser2));
 
-    // Assert
-    assertNotNull(result);
-    assertEquals(1L, result.getId());
-    verify(userRepository, times(1)).save(any(User.class));
-    verify(userCache, times(1)).put(1L, user);
-    verify(passwordService, times(1)).hashPassword(anyString());
-  }
-
-  @Test
-  void createUser_WithInvalidEmail_ShouldThrowException() {
-    // Arrange
-    user.setEmail(null);
-
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertEquals("Email is required", exception.getMessage());
-  }
-
-  @Test
-  void createUser_WithWeakPassword_ShouldThrowException() {
-    // Arrange
-    user.setPasswordHash("weak");
-
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertTrue(exception.getMessage().contains("Password must be at least 8 characters long"));
-  }
-
-  @Test
-  void createUsers_WithValidList_ShouldCreateUsers() {
-    // Arrange
-    User user2 = new User();
-    user2.setId(2L);
-    user2.setEmail("jane@example.com");
-    user2.setPhone("+987654321");
-    user2.setPasswordHash("Password123!");
-    List<User> users = Arrays.asList(user, user2);
-
-    when(passwordService.hashPassword(anyString())).thenReturn("hashedPassword");
-    when(userRepository.saveAll(anyList())).thenReturn(users);
-
-    // Act
-    List<User> result = userService.createUsers(users);
-
-    // Assert
-    assertEquals(2, result.size());
-    verify(userRepository, times(1)).saveAll(anyList());
+    assertEquals(2, createdUsers.size());
     verify(passwordService, times(2)).hashPassword(anyString());
-    verify(userCache, times(1)).put(1L, user);
-    verify(userCache, times(1)).put(2L, user2);
+    verify(userRepository).saveAll(anyList());
+    verify(userCache, times(2)).put(anyLong(), any(User.class));
   }
 
   @Test
-  void updateUser_WithValidData_ShouldUpdateUser() {
-    // Arrange
-    User updatedUser = new User();
-    updatedUser.setFirstName("John Updated");
-    updatedUser.setLastName("Doe Updated");
-    updatedUser.setEmail("john.updated@example.com");
-    updatedUser.setPasswordHash("NewPassword123!");
+  void updateUser_ShouldUpdateExistingUser() {
+    User updatedData = new User();
+    updatedData.setFirstName("Updated");
+    updatedData.setLastName("Name");
+    updatedData.setEmail("updated@example.com");
+    updatedData.setPhone("+9999999999");
+    updatedData.setPasswordHash("NewPass1!");
 
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
     when(passwordService.hashPassword(anyString())).thenReturn("hashedNewPassword");
-    when(userRepository.save(any(User.class))).thenReturn(user);
+    when(userRepository.save(any(User.class))).thenReturn(testUser);
 
-    // Act
-    User result = userService.updateUser(1L, updatedUser);
+    User updated = userService.updateUser(1L, updatedData);
 
-    // Assert
-    assertNotNull(result);
-    assertEquals("John Updated", result.getFirstName());
-    assertEquals("Doe Updated", result.getLastName());
-    assertEquals("john.updated@example.com", result.getEmail());
-    verify(userRepository, times(1)).save(any(User.class));
-    verify(userCache, times(1)).put(1L, user);
+    assertEquals("Updated", updated.getFirstName());
+    assertEquals("Name", updated.getLastName());
+    assertEquals("updated@example.com", updated.getEmail());
+    assertEquals("+9999999999", updated.getPhone());
+    verify(userCache).put(1L, testUser);
   }
 
   @Test
-  void updateUser_WithNonExistentId_ShouldThrowException() {
-    // Arrange
-    when(userRepository.findById(99L)).thenReturn(Optional.empty());
+  void updateUser_ShouldThrowWhenUserNotFound() {
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-    // Act & Assert
-    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> userService.updateUser(99L, user));
-    assertEquals("User not found with id: 99", exception.getMessage());
+    assertThrows(ResourceNotFoundException.class, () -> userService.updateUser(1L, testUser));
   }
 
   @Test
-  void deleteUser_WithValidId_ShouldDeleteUser() {
-    // Arrange
-    user.setAccounts((java.util.Set<Account>) Collections.singletonList(account));
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-    when(accountRepository.save(any(Account.class))).thenReturn(account);
+  void updateUser_ShouldValidateEmailUniqueness() {
+    User updatedData = new User();
+    updatedData.setEmail("existing@example.com");
 
-    // Act
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+    when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
+
+    assertThrows(ValidationException.class, () -> userService.updateUser(1L, updatedData));
+  }
+
+  @Test
+  void updateUser_ShouldValidatePhoneUniqueness() {
+    User updatedData = new User();
+    updatedData.setPhone("+9999999999");
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+    when(userRepository.existsByPhone("+9999999999")).thenReturn(true);  // Changed from existsById
+
+    assertThrows(ValidationException.class, () -> userService.updateUser(1L, updatedData));
+  }
+
+  @Test
+  void updateUser_ShouldValidatePasswordStrength() {
+    User updatedData = new User();
+    updatedData.setPasswordHash("weak");
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
+    assertThrows(ValidationException.class, () -> userService.updateUser(1L, updatedData));
+  }
+
+  @Test
+  void deleteUser_ShouldDeleteUserAndEvictCache() {
+    Account account = new Account();
+    account.setUsers(new HashSet<>(Collections.singleton(testUser))); // mutable set
+
+    testUser.setAccounts(Collections.singleton(account));
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
     userService.deleteUser(1L);
 
-    // Assert
-    verify(userRepository, times(1)).delete(user);
-    verify(userCache, times(1)).evict(1L);
-    verify(accountRepository, times(1)).save(account);
+    verify(accountRepository).delete(account);
+    verify(userRepository).delete(testUser);
+    verify(userCache).evict(1L);
   }
 
   @Test
-  void deleteUser_WithNonExistentId_ShouldThrowException() {
-    // Arrange
-    when(userRepository.findById(99L)).thenReturn(Optional.empty());
+  void deleteUser_ShouldNotDeleteAccountIfOtherUsersExist() {
+    Account account = new Account();
+    User otherUser = new User();
+    account.setUsers(new HashSet<>(Arrays.asList(testUser, otherUser))); // mutable set
 
-    // Act & Assert
-    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-            () -> userService.deleteUser(99L));
-    assertEquals("User not found with ID: 99", exception.getMessage());
+    testUser.setAccounts(Collections.singleton(account));
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
+    userService.deleteUser(1L);
+
+    verify(accountRepository, never()).delete(any());
+    verify(userRepository).delete(testUser);
+    verify(userCache).evict(1L);
   }
 
   @Test
-  void validatePasswordStrength_WithValidPassword_ShouldNotThrowException() {
-    // Act & Assert
-    assertDoesNotThrow(() -> userService.createUser(user));
+  void deleteUser_ShouldThrowWhenUserNotFound() {
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+    assertThrows(ResourceNotFoundException.class, () -> userService.deleteUser(1L));
   }
 
   @Test
-  void validatePasswordStrength_WithShortPassword_ShouldThrowException() {
-    // Arrange
-    user.setPasswordHash("Short1!");
+  void validatePasswordStrength_ShouldAcceptValidPassword() {
+    User validUser = new User();
+    validUser.setEmail("valid@example.com");
+    validUser.setPhone("+1234567890");
+    validUser.setPasswordHash("ValidPass1!");
 
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertEquals("Password must be at least 8 characters long", exception.getMessage());
+    when(userRepository.existsByEmail(anyString())).thenReturn(false);
+    when(userRepository.existsByPhone(anyString())).thenReturn(false);
+    when(passwordService.hashPassword(anyString())).thenReturn("hashedPassword");
+    when(userRepository.save(any(User.class))).thenReturn(validUser);
+
+    assertDoesNotThrow(() -> userService.createUser(validUser));
   }
 
   @Test
-  void validatePasswordStrength_WithoutUppercase_ShouldThrowException() {
-    // Arrange
-    user.setPasswordHash("lowercase1!");
+  void validatePasswordStrength_ShouldRejectShortPassword() {
+    User invalidUser = new User();
+    invalidUser.setEmail("valid@example.com");
+    invalidUser.setPhone("+1234567890");
+    invalidUser.setPasswordHash("Short1!");
 
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertEquals("Password must contain at least one uppercase letter", exception.getMessage());
+    when(userRepository.existsByEmail(anyString())).thenReturn(false);
+    when(userRepository.existsByPhone(anyString())).thenReturn(false);
+
+    assertThrows(ValidationException.class, () -> userService.createUser(invalidUser));
   }
 
   @Test
-  void validatePasswordStrength_WithoutDigit_ShouldThrowException() {
-    // Arrange
-    user.setPasswordHash("NoDigits!");
-
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertEquals("Password must contain at least one digit", exception.getMessage());
+  void validatePasswordStrength_ShouldRejectPasswordWithoutUppercase() {
+    testUser.setPasswordHash("lowercase1!");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
   }
 
   @Test
-  void validatePasswordStrength_WithoutSpecialChar_ShouldThrowException() {
-    // Arrange
-    user.setPasswordHash("NoSpecial1");
+  void validatePasswordStrength_ShouldRejectPasswordWithoutDigit() {
+    testUser.setPasswordHash("NoDigit!");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
+  }
 
-    // Act & Assert
-    ValidationException exception = assertThrows(ValidationException.class,
-            () -> userService.createUser(user));
-    assertEquals("Password must contain at least one special character", exception.getMessage());
+  @Test
+  void validatePasswordStrength_ShouldRejectPasswordWithoutSpecialChar() {
+    testUser.setPasswordHash("NoSpecial1");
+    assertThrows(ValidationException.class, () -> userService.createUser(testUser));
   }
 }

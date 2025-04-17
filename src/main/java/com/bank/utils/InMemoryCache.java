@@ -79,7 +79,7 @@ public class InMemoryCache<K, V> {
     }
     this.ttlMillis = ttlMillis;
     this.maxSize = maxSize;
-    this.cache = HashMap.newHashMap(maxSize);
+    this.cache = new HashMap<>(maxSize);
 
     ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     scheduler.scheduleAtFixedRate(this::evictExpiredEntries,

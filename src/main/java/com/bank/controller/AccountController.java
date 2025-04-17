@@ -119,16 +119,16 @@ public class AccountController {
   }
 
   /**
-   * Batch update of accounts
+   * Batch update of accounts.
    * @param accounts List of accounts to update
-   * @return List of updated accounts
+   * @return List of updated accounts.
    */
   @Operation(summary = "Массовое обновление счетов",
           description = "Обновляет несколько счетов одновременно")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Счета успешно обновлены"),
-          @ApiResponse(responseCode = "400", description = "Некорректные данные"),
-          @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
+      @ApiResponse(responseCode = "200", description = "Счета успешно обновлены"),
+      @ApiResponse(responseCode = "400", description = "Некорректные данные"),
+      @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
   })
   @PutMapping("/batch")
   public ResponseEntity<List<Account>> updateAccounts(@Valid @RequestBody List<Account> accounts) {
@@ -179,8 +179,8 @@ public class AccountController {
   @Operation(summary = "Массовое удаление счетов",
           description = "Удаляет несколько счетов по их ID")
   @ApiResponses(value = {
-          @ApiResponse(responseCode = "204", description = "Счета успешно удалены"),
-          @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
+      @ApiResponse(responseCode = "204", description = "Счета успешно удалены"),
+      @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
   })
   @DeleteMapping("/batch")
   @ResponseStatus(HttpStatus.NO_CONTENT)

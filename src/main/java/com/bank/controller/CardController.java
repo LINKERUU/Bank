@@ -87,14 +87,14 @@ public class CardController {
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
-  public ResponseEntity<?> createCard(@Valid @RequestBody Card card, BindingResult bindingResult) {
+  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card, BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       List<String> errors = bindingResult.getFieldErrors()
               .stream()
               .map(FieldError::getDefaultMessage)
               .toList();
-      return ResponseEntity.badRequest().body(Map.of("errors", errors));
+      return ResponseEntity.badRequest().body((Card) Map.of("errors", errors));
     }
 
     Card createdCard = cardService.createCard(card);

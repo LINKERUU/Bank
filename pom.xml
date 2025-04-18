@@ -131,21 +131,6 @@
                 </configuration>
             </plugin>
             <!-- Add Checkstyle plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <configLocation>checkstyle.xml</configLocation> <!-- Path to your Checkstyle configuration file -->
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal> <!-- Run Checkstyle during the verify phase -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <profiles>

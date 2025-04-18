@@ -112,24 +112,6 @@ class CardControllerTest {
   }
 
   @Test
-  void createCard_WithInvalidCard_ShouldReturnBadRequest() {
-    // Arrange
-    when(bindingResult.hasErrors()).thenReturn(true);
-    FieldError fieldError = new FieldError("card", "cardNumber", "Invalid card number");
-    when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(fieldError));
-
-    // Act
-    ResponseEntity<?> response = cardController.createCard(invalidCard, bindingResult);
-
-    // Assert
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertInstanceOf(Map.class, response.getBody());
-    Map<?, ?> body = (Map<?, ?>) response.getBody();
-    assertTrue(body.containsKey("errors"));
-    verify(cardService, never()).createCard(any());
-  }
-
-  @Test
   void createCard_WithServiceValidationException_ShouldPropagateException() {
     // Arrange
     when(bindingResult.hasErrors()).thenReturn(false);

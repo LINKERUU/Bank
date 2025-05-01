@@ -131,8 +131,8 @@ public class AccountController {
       @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
   })
   @PutMapping("/batch")
-  public ResponseEntity<List<Account>> updateAccounts(@Valid @RequestBody List<Account> accounts) {
-    return ResponseEntity.ok(accountService.updateAccounts(accounts));
+  public List<Account> updateAccounts( @RequestBody List<Account> accounts) {
+    return accountService.updateAccounts(accounts);
   }
 
   /**

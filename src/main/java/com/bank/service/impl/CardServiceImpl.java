@@ -107,7 +107,13 @@ public class CardServiceImpl implements CardService {
     return savedCard;
   }
 
-  private void validateCard(Card card) {
+  /**
+   * Validates a card object for required fields and proper formatting.
+   *
+   * @param card the card to validate
+   * @throws ValidationException if the card is null or contains invalid data
+   */
+  public void validateCard(Card card) {
     if (card == null) {
       throw new ValidationException("Card cannot be null");
     }
@@ -125,7 +131,14 @@ public class CardServiceImpl implements CardService {
     }
   }
 
-  private void validateCardNumber(String cardNumber) {
+
+  /**
+   * Validates a card number using the Luhn algorithm and checks for proper length.
+   *
+   * @param cardNumber the card number to validate
+   * @throws ValidationException if the card number is null, empty, or invalid
+   */
+  public void validateCardNumber(String cardNumber) {
     if (cardNumber == null) {
       throw new ValidationException("Card number cannot be null");
     }
@@ -134,7 +147,14 @@ public class CardServiceImpl implements CardService {
     }
   }
 
-  private void validateExpirationDate(YearMonth expirationDate) {
+
+  /**
+   * Validates a card's expiration date to ensure it's not in the past.
+   *
+   * @param expirationDate the expiration date to validate
+   * @throws ValidationException if the date is null or expired
+   */
+  public void validateExpirationDate(YearMonth expirationDate) {
     if (expirationDate == null) {
       throw new ValidationException("Expiration date cannot be null");
     }
@@ -150,7 +170,14 @@ public class CardServiceImpl implements CardService {
     }
   }
 
-  private void validateCvv(String cvv) {
+
+  /**
+   * Validates a card's CVV code to ensure it's 3 or 4 digits.
+   *
+   * @param cvv the CVV code to validate
+   * @throws ValidationException if the CVV is null, empty, or invalid
+   */
+  public void validateCvv(String cvv) {
     if (cvv == null) {
       throw new ValidationException("CVV cannot be null");
     }

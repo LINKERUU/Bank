@@ -28,14 +28,4 @@ public class PasswordService {
     return passwordEncoder.encode(plainPassword);
   }
 
-  /**
-   * Verifies if a plain text password matches a hashed password.
-   *
-   * @param plainPassword  the plain text password to check
-   * @param hashedPassword the hashed password to compare against
-   * @return true if the passwords match, otherwise false
-   */
-  public boolean checkPassword(String plainPassword, String hashedPassword) {
-    return passwordEncoder.matches(plainPassword, hashedPassword);
-  }
 }

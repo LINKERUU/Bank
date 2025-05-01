@@ -1,5 +1,6 @@
 package com.bank.service;
 
+
 import com.bank.model.Card;
 import java.util.List;
 import java.util.Optional;
@@ -55,4 +56,5 @@ public interface CardService {
    * @param id the ID of the card to delete
    */
   void deleteCard(Long id);
+
 }

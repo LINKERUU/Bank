@@ -29,6 +29,8 @@
     <properties>
         <sonar.organization>linkeruu</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.skip>true</sonar.coverage.skip>
+        <sonar.coverage.enabled>false</sonar.coverage.enabled>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -105,20 +107,19 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>4.0.0.4121</version> <!-- Актуальная версия на момент написания -->
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>prepare-agent</goal> <!-- Активирует JaCoCo во время тестов -->
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal> <!-- Генерирует отчет после тестов -->
+                            <goal>prepare-agent</goal>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>

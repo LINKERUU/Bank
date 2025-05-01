@@ -87,7 +87,8 @@ public class CardController {
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
-  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card, BindingResult bindingResult) {
+  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card,
+                                         BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       List<String> errors = bindingResult.getFieldErrors()

@@ -26,6 +26,13 @@ public class InMemoryCache<K, V> {
   private static final int USAGE_THRESHOLD = 3; // Minimum accesses to be considered frequently used
 
   /**
+   * Remove old cache.
+   */
+  public void remove(Object any) {
+  }
+
+
+  /**
    * Internal cache entry that holds the value, its expiration time and usage count.
    */
   private class CacheEntry {

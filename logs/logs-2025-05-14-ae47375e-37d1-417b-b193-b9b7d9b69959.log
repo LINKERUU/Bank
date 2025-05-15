@@ -1,0 +1,85 @@
+2025-05-14T19:30:47.978+03:00  INFO 15860 --- [Bank] [main] com.bank.BankApplication                 : Starting BankApplication using Java 23.0.2 with PID 15860 (D:\Coding\Java\Bank\target\classes started by SAFA in D:\Coding\Java\Bank)
+2025-05-14T19:30:47.982+03:00 DEBUG 15860 --- [Bank] [main] com.bank.BankApplication                 : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-05-14T19:30:47.983+03:00  INFO 15860 --- [Bank] [main] com.bank.BankApplication                 : No active profile set, falling back to 1 default profile: "default"
+2025-05-14T19:30:48.866+03:00  INFO 15860 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-14T19:30:48.932+03:00  INFO 15860 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 57 ms. Found 5 JPA repository interfaces.
+2025-05-14T19:30:49.687+03:00  INFO 15860 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-14T19:30:49.701+03:00  INFO 15860 --- [Bank] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-14T19:30:49.701+03:00  INFO 15860 --- [Bank] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-05-14T19:30:49.757+03:00  INFO 15860 --- [Bank] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-14T19:30:49.757+03:00  INFO 15860 --- [Bank] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1700 ms
+2025-05-14T19:30:49.943+03:00  INFO 15860 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-14T19:30:50.165+03:00  INFO 15860 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-05-14T19:30:50.274+03:00  INFO 15860 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-14T19:30:51.126+03:00  INFO 15860 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-14T19:30:51.314+03:00  INFO 15860 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-14T19:30:51.866+03:00  INFO 15860 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6728370a
+2025-05-14T19:30:51.870+03:00  INFO 15860 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-14T19:30:52.039+03:00  WARN 15860 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-14T19:30:52.087+03:00  INFO 15860 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-05-14T19:30:54.047+03:00  INFO 15860 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-14T19:30:54.724+03:00  INFO 15860 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-14T19:30:55.755+03:00  INFO 15860 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-05-14T19:30:58.233+03:00  WARN 15860 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-14T19:30:58.482+03:00  INFO 15860 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-05-14T19:31:01.044+03:00  INFO 15860 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-14T19:31:01.131+03:00  INFO 15860 --- [Bank] [main] com.bank.BankApplication                 : Started BankApplication in 13.697 seconds (process running for 19.165)
+2025-05-14T19:31:01.331+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-14T19:31:01.334+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-05-14T19:31:01.339+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-05-14T19:31:06.448+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-8] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 3836 ms
+2025-05-14T19:31:44.502+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-10] com.bank.aspect.LoggingAspect            : Executing method: LogController.generateLogFile(..)
+2025-05-14T19:31:44.505+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-10] com.bank.service.impl.LogServiceImpl     : Создана новая задача 901a3cc5-2124-48c0-8482-c186cfcace34 для даты 2025-05-14
+2025-05-14T19:31:44.505+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-10] com.bank.aspect.LoggingAspect            : Method LogController.generateLogFile(..) executed successfully. Result: {taskId=901a3cc5-2124-48c0-8482-c186cfcace34}
+2025-05-14T19:32:00.330+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.aspect.LoggingAspect            : Executing method: LogController.getTaskStatus(..)
+2025-05-14T19:32:00.334+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.service.impl.LogServiceImpl     : Задача 901a3cc5-2124-48c0-8482-c186cfcace34 - ожидание 5 секунд перед обработкой
+2025-05-14T19:32:05.340+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.service.impl.LogServiceImpl     : Задача 901a3cc5-2124-48c0-8482-c186cfcace34 - статус изменен на PROCESSING: Reading logs
+2025-05-14T19:32:07.347+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.service.impl.LogServiceImpl     : Задача 901a3cc5-2124-48c0-8482-c186cfcace34 - статус изменен на PROCESSING: Filtering logs
+2025-05-14T19:32:08.900+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-6] com.bank.aspect.LoggingAspect            : Executing method: LogController.downloadLogFile(..)
+2025-05-14T19:32:08.906+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-6] com.bank.aspect.LoggingAspect            : Method LogController.downloadLogFile(..) executed successfully. Result: <404 NOT_FOUND Not Found,[]>
+2025-05-14T19:32:09.359+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.service.impl.LogServiceImpl     : Задача 901a3cc5-2124-48c0-8482-c186cfcace34 - статус изменен на PROCESSING: Saving file
+2025-05-14T19:32:11.368+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.service.impl.LogServiceImpl     : Задача 901a3cc5-2124-48c0-8482-c186cfcace34 - статус изменен на COMPLETED
+2025-05-14T19:32:11.369+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-9] com.bank.aspect.LoggingAspect            : Method LogController.getTaskStatus(..) executed successfully. Result: {createdAt=2025-05-14T19:31:44.505150, taskId=901a3cc5-2124-48c0-8482-c186cfcace34, status=COMPLETED}
+2025-05-14T19:32:16.252+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-3] com.bank.aspect.LoggingAspect            : Executing method: LogController.downloadLogFile(..)
+2025-05-14T19:32:16.267+03:00  INFO 15860 --- [Bank] [http-nio-8080-exec-3] com.bank.aspect.LoggingAspect            : Method LogController.downloadLogFile(..) executed successfully. Result: <200 OK OK,URL [file:///D:/Coding/Java/Bank/./logs/logs-2025-05-14-901a3cc5-2124-48c0-8482-c186cfcace34.log],[Content-Disposition:"attachment; filename=logs-2025-05-14-901a3cc5-2124-48c0-8482-c186cfcace34.log", Content-Type:"application/octet-stream"]>
+2025-05-14T19:47:51.189+03:00  INFO 15860 --- [Bank] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-05-14T19:47:51.201+03:00  INFO 15860 --- [Bank] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-05-14T19:47:51.204+03:00  INFO 15860 --- [Bank] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-05-14T19:47:51.206+03:00  INFO 15860 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-05-14T19:47:51.208+03:00  INFO 15860 --- [Bank] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-05-14T19:48:49.651+03:00  INFO 19580 --- [Bank] [main] com.bank.BankApplication                 : Starting BankApplication using Java 23.0.2 with PID 19580 (D:\Coding\Java\Bank\target\classes started by SAFA in D:\Coding\Java\Bank)
+2025-05-14T19:48:49.652+03:00 DEBUG 19580 --- [Bank] [main] com.bank.BankApplication                 : Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-05-14T19:48:49.653+03:00  INFO 19580 --- [Bank] [main] com.bank.BankApplication                 : No active profile set, falling back to 1 default profile: "default"
+2025-05-14T19:48:50.301+03:00  INFO 19580 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-05-14T19:48:50.362+03:00  INFO 19580 --- [Bank] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 5 JPA repository interfaces.
+2025-05-14T19:48:50.973+03:00  INFO 19580 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-14T19:48:50.999+03:00  INFO 19580 --- [Bank] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-14T19:48:51.001+03:00  INFO 19580 --- [Bank] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-05-14T19:48:51.054+03:00  INFO 19580 --- [Bank] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-05-14T19:48:51.054+03:00  INFO 19580 --- [Bank] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1356 ms
+2025-05-14T19:48:51.255+03:00  INFO 19580 --- [Bank] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-05-14T19:48:51.299+03:00  INFO 19580 --- [Bank] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-05-14T19:48:51.320+03:00  INFO 19580 --- [Bank] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-05-14T19:48:51.528+03:00  INFO 19580 --- [Bank] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-05-14T19:48:51.556+03:00  INFO 19580 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-05-14T19:48:51.713+03:00  INFO 19580 --- [Bank] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@45e639ee
+2025-05-14T19:48:51.714+03:00  INFO 19580 --- [Bank] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-05-14T19:48:51.756+03:00  WARN 19580 --- [Bank] [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-05-14T19:48:51.772+03:00  INFO 19580 --- [Bank] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2025-05-14T19:48:52.594+03:00  INFO 19580 --- [Bank] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-05-14T19:48:52.908+03:00  INFO 19580 --- [Bank] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-05-14T19:48:53.295+03:00  INFO 19580 --- [Bank] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-05-14T19:48:54.461+03:00  WARN 19580 --- [Bank] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-05-14T19:48:54.531+03:00  INFO 19580 --- [Bank] [main] o.s.v.b.OptionalValidatorFactoryBean     : Failed to set up a Bean Validation provider: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+2025-05-14T19:48:55.191+03:00  INFO 19580 --- [Bank] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-05-14T19:48:55.201+03:00  INFO 19580 --- [Bank] [main] com.bank.BankApplication                 : Started BankApplication in 5.89 seconds (process running for 6.39)
+2025-05-14T19:50:47.615+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-14T19:50:47.616+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-05-14T19:50:47.618+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2025-05-14T19:50:47.669+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] com.bank.aspect.LoggingAspect            : Executing method: LogController.generateLogFile(..)
+2025-05-14T19:50:47.670+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] com.bank.service.impl.LogServiceImpl     : Создана новая задача ae47375e-37d1-417b-b193-b9b7d9b69959 для даты 2025-05-14
+2025-05-14T19:50:47.671+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-1] com.bank.aspect.LoggingAspect            : Method LogController.generateLogFile(..) executed successfully. Result: {taskId=ae47375e-37d1-417b-b193-b9b7d9b69959}
+2025-05-14T19:50:57.465+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-4] com.bank.aspect.LoggingAspect            : Executing method: LogController.getTaskStatus(..)
+2025-05-14T19:50:57.470+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-4] com.bank.service.impl.LogServiceImpl     : Задача ae47375e-37d1-417b-b193-b9b7d9b69959 - ожидание 5 секунд перед обработкой
+2025-05-14T19:51:02.474+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-4] com.bank.service.impl.LogServiceImpl     : Задача ae47375e-37d1-417b-b193-b9b7d9b69959 - статус изменен на PROCESSING: Reading logs
+2025-05-14T19:51:04.485+03:00  INFO 19580 --- [Bank] [http-nio-8080-exec-4] com.bank.service.impl.LogServiceImpl     : Задача ae47375e-37d1-417b-b193-b9b7d9b69959 - статус изменен на PROCESSING: Filtering logs

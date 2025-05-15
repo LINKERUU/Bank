@@ -1,14 +1,23 @@
 package com.bank.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class LogTask {
-  private String id;
+  // Геттеры
+  private final String id;
+  // Сеттеры
+  @Setter
   private String status;
-  private String date;
+  private final String date;
+  @Setter
   private String filePath;
+  @Setter
   private String errorMessage;
-  private LocalDateTime createdAt;
+  private final LocalDateTime createdAt;
 
   public LogTask(String id, String status, String date, LocalDateTime createdAt) {
     this.id = id;
@@ -17,16 +26,9 @@ public class LogTask {
     this.createdAt = createdAt;
   }
 
-  // Геттеры
-  public String getId() { return id; }
-  public String getStatus() { return status; }
-  public String getDate() { return date; }
-  public String getFilePath() { return filePath; }
-  public String getErrorMessage() { return errorMessage; }
-  public LocalDateTime getCreatedAt() { return createdAt; }
+  public void setLastUpdated(LocalDateTime now) {
+  }
 
-  // Сеттеры
-  public void setStatus(String status) { this.status = status; }
-  public void setFilePath(String filePath) { this.filePath = filePath; }
-  public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+  public void setErrorDetails(String details) {
+  }
 }

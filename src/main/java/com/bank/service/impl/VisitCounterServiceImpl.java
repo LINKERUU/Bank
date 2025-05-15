@@ -91,7 +91,7 @@ public class VisitCounterServiceImpl implements VisitCounterService {
     return result;
   }
 
-  @Scheduled(fixedRate = 60000)
+  @Scheduled(fixedRate = 6000)
   @Transactional
   public void saveCountersToDatabase() {
     List<Visit> visitsToSave = new ArrayList<>();

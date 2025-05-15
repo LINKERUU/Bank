@@ -58,13 +58,6 @@ public interface AccountService {
    */
   List<Account> createAccounts(List<Account> accounts);
 
-  /**
-   * Batch update of accounts with validation.
-   * param accounts List of accounts to update
-   * return List of updated accounts
-   */
-  List<Account> updateAccounts(List<Account> accounts);
-
 
   /**
    * Updates an existing account.
@@ -81,12 +74,5 @@ public interface AccountService {
    * @param id the ID of the account to delete
    */
   void deleteAccount(Long id);
-
-  /**
-   * Deletes accounts by its ID.
-   *
-   * @param ids the ID of the account to delete
-   */
-  void deleteAccounts(List<Long> ids);
 
 }

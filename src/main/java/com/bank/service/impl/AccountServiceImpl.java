@@ -8,7 +8,6 @@ import com.bank.repository.CardRepository;
 import com.bank.service.AccountService;
 import com.bank.utils.InMemoryCache;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -144,22 +143,6 @@ public class AccountServiceImpl implements AccountService {
     accountCache.evict(id);
   }
 
-  @Override
-  @Transactional
-  public void deleteAccounts(List<Long> ids) {
-    ids.forEach(id -> {
-      Account account = accountRepository.findById(id)
-              .orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + id));
-
-      // Удаляем связанные карты
-      if (account.getCards() != null && !account.getCards().isEmpty()) {
-        cardRepository.deleteAll(account.getCards());
-      }
-
-      accountRepository.delete(account);
-      accountCache.evict(id);
-    });
-  }
 
   @Override
   @Transactional
@@ -177,65 +160,6 @@ public class AccountServiceImpl implements AccountService {
     Account savedAccount = accountRepository.save(existingAccount);
     accountCache.put(id, savedAccount);
     return savedAccount;
-  }
-
-  @Override
-  @Transactional
-  public List<Account> updateAccounts(List<Account> accounts) {
-    // Проверка на null и пустой список
-    if (accounts == null) {
-      throw new ValidationException("Accounts list cannot be null");
-    }
-    if (accounts.isEmpty()) {
-      throw new ValidationException("Accounts list cannot be empty");
-    }
-
-    // Проверка на null элементы
-    if (accounts.stream().anyMatch(Objects::isNull)) {
-      throw new ValidationException("Account list contains null elements");
-    }
-
-    // Собираем ID всех аккаунтов для обновления
-    List<Long> accountIds = accounts.stream()
-            .map(Account::getId)
-            .collect(Collectors.toList());
-
-    // Получаем все существующие аккаунты одним запросом
-    Map<Long, Account> existingAccounts = accountRepository.findAllById(accountIds)
-            .stream()
-            .collect(Collectors.toMap(Account::getId, Function.identity()));
-
-    // Подготавливаем список для обновления
-    List<Account> accountsToUpdate = new ArrayList<>();
-
-
-    for (Account updateData : accounts) {
-      // Проверяем ID
-      if (updateData.getId() == null) {
-        throw new ValidationException("Account ID cannot be null");
-      }
-
-      // Проверяем существование аккаунта
-      Account existingAccount = existingAccounts.get(updateData.getId());
-      if (existingAccount == null) {
-        throw new ResourceNotFoundException("Account not found with id: " + updateData.getId());
-      }
-      // Обновляем только указанные поля (игнорируем null значения)
-      if (updateData.getAccountNumber() != null) {
-        existingAccount.setAccountNumber(updateData.getAccountNumber());
-      }
-      if (updateData.getBalance() != null) {
-        existingAccount.setBalance(updateData.getBalance());
-      }
-
-      accountsToUpdate.add(existingAccount);
-    }
-
-    // Сохраняем все изменения
-    List<Account> updatedAccounts = accountRepository.saveAll(existingAccounts.values());
-
-
-    return updatedAccounts;
   }
 
 

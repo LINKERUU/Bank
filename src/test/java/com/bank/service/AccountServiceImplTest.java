@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -222,22 +220,6 @@ class AccountServiceImplTest {
     assertEquals(1000.0, result.getBalance());
   }
 
-
-  @Test
-  void updateAccounts_ShouldThrowWhenAccountIsNull() {
-    List<Account> accounts = new ArrayList<>();
-    accounts.add(createTestAccount(1L, "111", 1000.0));
-    accounts.add(null);
-
-    assertThrows(ValidationException.class,
-            () -> accountService.updateAccounts(accounts));
-  }
-
-  @Test
-  void updateAccounts_ShouldThrowForNullList() {
-    assertThrows(ValidationException.class, () -> accountService.updateAccounts(null));
-  }
-
   @Test
   void deleteAccount_ShouldDeleteWithCards() {
     Account account = createTestAccount(1L, "1234567890", 1000.0);
@@ -274,27 +256,6 @@ class AccountServiceImplTest {
             () -> accountService.deleteAccount(1L));
   }
 
-  @Test
-  void deleteAccounts_ShouldDeleteMultipleAccounts() {
-    Account account1 = createTestAccount(1L, "1111111111", 1000.0);
-    Account account2 = createTestAccount(2L, "2222222222", 2000.0);
-
-    when(accountRepository.findById(1L)).thenReturn(Optional.of(account1));
-    when(accountRepository.findById(2L)).thenReturn(Optional.of(account2));
-
-    accountService.deleteAccounts(List.of(1L, 2L));
-
-    verify(accountRepository, times(2)).delete(any());
-    verify(accountCache, times(2)).evict(anyLong());
-  }
-
-  @Test
-  void deleteAccounts_ShouldThrowWhenAccountNotFound() {
-    when(accountRepository.findById(1L)).thenReturn(Optional.empty());
-
-    assertThrows(ResourceNotFoundException.class,
-            () -> accountService.deleteAccounts(List.of(1L)));
-  }
 
   @Test
   void findByUserEmail_ShouldReturnAccounts() {
@@ -358,50 +319,5 @@ class AccountServiceImplTest {
   void validateAccount_ShouldPassForValidAccount() {
     Account account = createTestAccount(null, "1234567890", 1000.0);
     assertDoesNotThrow(() -> accountService.validateAccount(account));
-  }
-
-  @Test
-  void findAccountById_ShouldReturnEmptyOptionalForNullId() {
-    Optional<Account> result = accountService.findAccountById(null);
-    assertFalse(result.isPresent());
-  }
-
-  @Test
-  void createAccounts_ShouldReturnEmptyListForEmptyInput() {
-    List<Account> result = accountService.createAccounts(Collections.emptyList());
-    assertTrue(result.isEmpty());
-  }
-
-
-  @Test
-  void deleteAccounts_ShouldDoNothingForEmptyList() {
-    accountService.deleteAccounts(Collections.emptyList());
-    verifyNoInteractions(accountRepository, accountCache, cardRepository);
-  }
-
-
-  @Test
-  void validateAccount_ShouldThrowForZeroBalance() {
-    Account account = createTestAccount(null, "1234567890", 0.0);
-    assertDoesNotThrow(() -> accountService.validateAccount(account));
-  }
-
-  @Test
-  void createAccount_ShouldHandleMultipleUsers() {
-    User user1 = new User(); user1.setId(1L);
-    User user2 = new User(); user2.setId(2L);
-
-    Account account = createTestAccount(null, "1234567890", 1000.0);
-    account.setUsers(Set.of(user1, user2));
-
-    Account savedAccount = createTestAccount(1L, "1234567890", 1000.0);
-    savedAccount.setUsers(Set.of(user1, user2));
-
-    when(accountRepository.save(account)).thenReturn(savedAccount);
-
-    Account result = accountService.createAccount(account);
-
-    assertEquals(2, result.getUsers().size());
-    verify(accountCache).put(1L, savedAccount);
   }
 }

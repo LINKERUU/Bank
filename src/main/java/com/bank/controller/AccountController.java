@@ -119,23 +119,6 @@ public class AccountController {
   }
 
   /**
-   * Creates a new account.
-   * account the account to create
-   * return the created account
-   */
-  @Operation(summary = "Массовое обновление счетов",
-          description = "Обновляет несколько счетов одновременно")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Счета успешно обновлены"),
-      @ApiResponse(responseCode = "400", description = "Некорректные данные"),
-      @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
-  })
-  @PutMapping("/batch")
-  public List<Account> updateAccounts( @RequestBody List<Account> accounts) {
-    return accountService.updateAccounts(accounts);
-  }
-
-  /**
    * Deletes an account by its ID.
    *
    * @param id the ID of the account to delete
@@ -174,22 +157,6 @@ public class AccountController {
   @GetMapping("/with-cards")
   public ResponseEntity<List<Account>> getAccountsWithCards() {
     return ResponseEntity.ok(accountService.findAccountsWithCards());
-  }
-
-  /**
-   * Deletes multiple accounts by their IDs.
-   * param ids the list of account IDs to delete
-   */
-  @Operation(summary = "Массовое удаление счетов",
-          description = "Удаляет несколько счетов по их ID")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Счета успешно удалены"),
-      @ApiResponse(responseCode = "404", description = "Один из счетов не найден")
-  })
-  @DeleteMapping("/batch")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteAccounts(@RequestBody List<Long> ids) {
-    accountService.deleteAccounts(ids);
   }
 
 }

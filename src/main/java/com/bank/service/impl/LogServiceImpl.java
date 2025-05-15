@@ -9,7 +9,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,80 +18,89 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class LogServiceImpl implements LogService {
 
   private static final String LOGS_DIRECTORY = "./logs";
   private static final String MAIN_LOG_FILE = "./logs/application.log";
+  private static final long INITIAL_DELAY_SECONDS = 1;
+  private static final long PROCESSING_STEP_DELAY_SECONDS = 10;
 
   private final Map<String, LogTask> tasks = new ConcurrentHashMap<>();
   private static final Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
+  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
+
+  // Статусы задачи
+  private enum TaskStatus {
+    CREATED("Задача создана"),
+    QUEUED("В очереди на выполнение"),
+    PREPARING("Подготовка к обработке"),
+    READING("Чтение лог-файла"),
+    FILTERING("Фильтрация записей"),
+    SAVING("Сохранение результата"),
+    COMPLETED("Завершено успешно"),
+    FAILED("Ошибка обработки");
+
+    private final String description;
+
+    TaskStatus(String description) {
+      this.description = description;
+    }
+  }
 
   @Override
   public String generateLogFile(String date) {
     String taskId = UUID.randomUUID().toString();
-    LogTask task = new LogTask(taskId, "PENDING", date, LocalDateTime.now());
+    LogTask task = new LogTask(taskId, TaskStatus.CREATED.name(), date, LocalDateTime.now());
     tasks.put(taskId, task);
 
-    processLogGenerationAsync(taskId, date);
+    // Планируем выполнение с начальной задержкой
+    scheduler.schedule(() -> processTask(taskId, date), INITIAL_DELAY_SECONDS, TimeUnit.SECONDS);
+
     return taskId;
   }
 
-  @Async
-  public void processLogGenerationAsync(String taskId, String date) {
-    logger.info("Начало обработки задачи {}", taskId);
-    LogTask task = tasks.get(taskId);
-
+  private void processTask(String taskId, String date) {
     try {
-      // Этап 1: Начало обработки
-      task.setStatus("PROCESSING: Reading logs");
-      logger.info("Task {} - Reading logs started", taskId);
-      TimeUnit.SECONDS.sleep(3);
+      updateStatus(taskId, TaskStatus.QUEUED);
 
+      // Этап 1: Подготовка
+      updateStatus(taskId, TaskStatus.PREPARING);
+      TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
+
+      // Этап 2: Чтение файла
+      updateStatus(taskId, TaskStatus.READING);
       Path logPath = Paths.get(MAIN_LOG_FILE);
       if (!Files.exists(logPath)) {
-        throw new IOException("Main log file not found");
+        throw new IOException("Основной файл логов не найден");
       }
 
-      // Этап 2: Фильтрация
-      task.setStatus("PROCESSING: Filtering logs");
-      logger.info("Task {} - Filtering started", taskId);
-      TimeUnit.SECONDS.sleep(3);
-
-      String filteredLogs;
-      try (Stream<String> lines = Files.lines(logPath)) {
-        filteredLogs = lines
-                .filter(line -> line.contains(date))
-                .collect(Collectors.joining("\n"));
-      }
-
-      // Этап 3: Сохранение файла
-      task.setStatus("PROCESSING: Saving file");
-      logger.info("Task {} - Saving started", taskId);
-      TimeUnit.SECONDS.sleep(3);
+      // Этап 3: Фильтрация
+      updateStatus(taskId, TaskStatus.FILTERING);
+      TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
+      String filteredLogs = Files.lines(logPath)
+              .filter(line -> line.contains(date))
+              .collect(Collectors.joining("\n"));
 
       if (filteredLogs.isEmpty()) {
-        throw new IOException("No logs found");
+        throw new IOException("Нет записей за указанную дату");
       }
 
+      // Этап 4: Сохранение
+      updateStatus(taskId, TaskStatus.SAVING);
+      TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
       Path outputFile = Paths.get(LOGS_DIRECTORY)
-              .resolve(String.format("logs-%s-%s.log", date, taskId));
+              .resolve(String.format("logs_%s_%s.log", date, taskId));
+      Files.createDirectories(outputFile.getParent());
       Files.write(outputFile, filteredLogs.getBytes());
 
-      task.setStatus("COMPLETED");
-      task.setFilePath(outputFile.toString());
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      task.setStatus("FAILED: Interrupted");
-      task.setErrorMessage(e.getMessage());
+      updateStatus(taskId, TaskStatus.COMPLETED, outputFile.toString());
     } catch (Exception e) {
-      task.setStatus("FAILED: " + e.getClass().getSimpleName());
-      task.setErrorMessage(e.getMessage());
+      logger.error("Ошибка обработки задачи {}", taskId, e);
+      updateStatus(taskId, TaskStatus.FAILED, e.getMessage());
     }
   }
 
@@ -100,7 +108,7 @@ public class LogServiceImpl implements LogService {
   public LogTask getTaskStatus(String taskId) {
     LogTask task = tasks.get(taskId);
     if (task == null) {
-      throw new RuntimeException("Task not found");
+      throw new RuntimeException("Задача не найдена");
     }
     return task;
   }
@@ -108,8 +116,8 @@ public class LogServiceImpl implements LogService {
   @Override
   public ResponseEntity<Resource> downloadLogFile(String taskId) {
     LogTask task = tasks.get(taskId);
-    if (task == null || !"COMPLETED".equals(task.getStatus())) {
-      return ResponseEntity.notFound().build();
+    if (task == null || !TaskStatus.COMPLETED.name().equals(task.getStatus())) {
+      return ResponseEntity.status(423).build(); // 423 Locked
     }
 
     try {
@@ -119,7 +127,7 @@ public class LogServiceImpl implements LogService {
       return ResponseEntity.ok()
               .header(HttpHeaders.CONTENT_DISPOSITION,
                       "attachment; filename=" + filePath.getFileName())
-              .contentType(MediaType.APPLICATION_OCTET_STREAM)
+              .contentType(MediaType.TEXT_PLAIN)
               .body(resource);
     } catch (Exception e) {
       return ResponseEntity.internalServerError().build();
@@ -128,19 +136,26 @@ public class LogServiceImpl implements LogService {
 
   @Override
   public String viewLogsByDate(String date) {
-    try {
-      Path logPath = Paths.get(MAIN_LOG_FILE);
-      if (!Files.exists(logPath)) {
-        throw new IOException("Main log file not found");
-      }
+    return "";
+  }
 
-      try (Stream<String> lines = Files.lines(logPath)) {
-        return lines
-                .filter(line -> line.contains(date))
-                .collect(Collectors.joining("\n"));
+  private void updateStatus(String taskId, TaskStatus status) {
+    updateStatus(taskId, status, null);
+  }
+
+  private void updateStatus(String taskId, TaskStatus status, String details) {
+    LogTask task = tasks.get(taskId);
+    if (task != null) {
+      task.setStatus(status.name());
+      task.setLastUpdated(LocalDateTime.now());
+      if (details != null) {
+        if (status == TaskStatus.COMPLETED) {
+          task.setFilePath(details);
+        } else if (status == TaskStatus.FAILED) {
+          task.setErrorDetails(details);
+        }
       }
-    } catch (Exception e) {
-      throw new RuntimeException("Error viewing logs", e);
+      logger.info("{}: {} - {}", taskId, status, status.description);
     }
   }
 }

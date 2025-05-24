@@ -1,38 +1,28 @@
 package com.bank.service.impl;
 
+import com.bank.dto.TransactionDto;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
-import com.bank.model.Account;
-import com.bank.model.Transaction;
 import com.bank.repository.AccountRepository;
 import com.bank.repository.TransactionRepository;
 import com.bank.service.TransactionService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementation of the TransactionService interface.
- * Provides business logic for transaction operations including
- * creation, retrieval, updating and deletion of transactions.
- */
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-  private static final String TRANSACTION_TYPE_DEBIT = "debit";
-  private static final String TRANSACTION_TYPE_CREDIT = "credit";
+  private static final String TRANSACTION_TYPE_DEBIT = "credit";
+  private static final String TRANSACTION_TYPE_CREDIT = "debit";
 
   private final TransactionRepository transactionRepository;
   private final AccountRepository accountRepository;
 
-  /**
-   * Constructs a new TransactionServiceImpl with required repositories.
-   *
-   * @param transactionRepository repository for transaction data access
-   * @param accountRepository repository for account data access
-   */
   @Autowired
   public TransactionServiceImpl(TransactionRepository transactionRepository,
                                 AccountRepository accountRepository) {
@@ -42,48 +32,94 @@ public class TransactionServiceImpl implements TransactionService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<Transaction> findAllTransactions() {
-    return transactionRepository.findAll();
+  public List<TransactionDto> findAllTransactions() {
+    return transactionRepository.findAll().stream()
+            .map(transaction -> {
+              TransactionDto dto = new TransactionDto();
+              dto.setId(transaction.getId());
+              dto.setAmount(transaction.getAmount());
+              dto.setTransactionType(transaction.getTransactionType());
+              dto.setDescription(transaction.getDescription());
+              dto.setTransactionDate(transaction.getTransactionDate());
+              dto.setAccountId(transaction.getAccount().getId());
+              dto.setAccountNumber(transaction.getAccount().getAccountNumber());
+              return dto;
+            })
+            .collect(Collectors.toList());
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<Transaction> findTransactionById(Long id) {
+  public Optional<TransactionDto> findTransactionById(Long id) {
     if (id == null || id <= 0) {
       throw new ValidationException("Invalid transaction ID");
     }
-    return transactionRepository.findById(id);
+    return transactionRepository.findById(id)
+            .map(transaction -> {
+              TransactionDto dto = new TransactionDto();
+              dto.setId(transaction.getId());
+              dto.setAmount(transaction.getAmount());
+              dto.setTransactionType(transaction.getTransactionType());
+              dto.setDescription(transaction.getDescription());
+              dto.setTransactionDate(transaction.getTransactionDate());
+              dto.setAccountId(transaction.getAccount().getId());
+              dto.setAccountNumber(transaction.getAccount().getAccountNumber());
+              return dto;
+            });
   }
 
   @Override
   @Transactional
-  public Transaction createTransaction(Transaction transaction) {
-    validateTransaction(transaction);
+  public TransactionDto createTransaction(TransactionDto transactionDTO) {
+    validateTransaction(transactionDTO);
 
-    Account account = accountRepository.findById(transaction.getAccountId())
+    var account = accountRepository.findById(transactionDTO.getAccountId())
             .orElseThrow(() -> new ResourceNotFoundException(
-                    "Account not found with ID: " + transaction.getAccountId()));
+                    "Account not found with ID: " + transactionDTO.getAccountId()));
+
+    var transaction = new com.bank.model.Transaction();
+    transaction.setAmount(transactionDTO.getAmount());
+    transaction.setTransactionType(transactionDTO.getTransactionType());
+    transaction.setDescription(transactionDTO.getDescription());
+    transaction.setTransactionDate(LocalDateTime.now());
+    transaction.setAccount(account);
 
     processTransaction(transaction, account);
 
     accountRepository.save(account);
-    return transactionRepository.save(transaction);
+    var savedTransaction = transactionRepository.save(transaction);
+
+    transactionDTO.setId(savedTransaction.getId());
+    transactionDTO.setTransactionDate(savedTransaction.getTransactionDate());
+    transactionDTO.setAccountNumber(account.getAccountNumber());
+    return transactionDTO;
   }
 
   @Override
   @Transactional
-  public Transaction updateTransaction(Long id, Transaction updatedTransaction) {
+  public TransactionDto updateTransaction(Long id, TransactionDto updatedTransactionDto) {
     validateTransactionId(id);
-    validateTransaction(updatedTransaction);
+    validateTransaction(updatedTransactionDto);
 
-    Transaction existing = transactionRepository.findById(id)
+    var existingTransaction = transactionRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                     "Transaction not found with ID: " + id));
 
-    updateAccountBalance(existing, updatedTransaction);
-    updateTransactionFields(existing, updatedTransaction);
+    updateAccountBalance(existingTransaction, updatedTransactionDto);
+    updateTransactionFields(existingTransaction, updatedTransactionDto);
 
-    return transactionRepository.save(existing);
+    var updatedTransaction = transactionRepository.save(existingTransaction);
+
+    TransactionDto resultDTO = new TransactionDto();
+    resultDTO.setId(updatedTransaction.getId());
+    resultDTO.setAmount(updatedTransaction.getAmount());
+    resultDTO.setTransactionType(updatedTransaction.getTransactionType());
+    resultDTO.setDescription(updatedTransaction.getDescription());
+    resultDTO.setTransactionDate(updatedTransaction.getTransactionDate());
+    resultDTO.setAccountId(updatedTransaction.getAccount().getId());
+    resultDTO.setAccountNumber(updatedTransaction.getAccount().getAccountNumber());
+
+    return resultDTO;
   }
 
   @Override
@@ -91,7 +127,7 @@ public class TransactionServiceImpl implements TransactionService {
   public void deleteTransaction(Long id) {
     validateTransactionId(id);
 
-    Transaction transaction = transactionRepository.findById(id)
+    var transaction = transactionRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                     "Transaction not found with ID: " + id));
 
@@ -105,29 +141,28 @@ public class TransactionServiceImpl implements TransactionService {
     }
   }
 
-  private void validateTransaction(Transaction transaction) {
-    if (transaction == null) {
+  private void validateTransaction(TransactionDto transactionDTO) {
+    if (transactionDTO == null) {
       throw new ValidationException("Transaction cannot be null");
     }
 
-    if (transaction.getAmount() == null || transaction.getAmount() <= 0) {
+    if (transactionDTO.getAmount() == null || transactionDTO.getAmount() <= 0) {
       throw new ValidationException("Transaction amount must be positive");
     }
 
-    if (transaction.getTransactionType() == null
-            || !(TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transaction.getTransactionType())
-            || TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(transaction.getTransactionType()))) {
+    if (transactionDTO.getTransactionType() == null
+            || !(TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transactionDTO.getTransactionType())
+            || TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(transactionDTO.getTransactionType()))) {
       throw new ValidationException("Transaction type must be 'credit' or 'debit'");
     }
 
-    if (transaction.getAccountId() == null) {
+    if (transactionDTO.getAccountId() == null) {
       throw new ValidationException("Account ID cannot be null");
     }
   }
 
-  private void processTransaction(Transaction transaction, Account account) {
+  private void processTransaction(com.bank.model.Transaction transaction, com.bank.model.Account account) {
     if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(transaction.getTransactionType())) {
-
       account.setBalance(account.getBalance() + transaction.getAmount());
     } else {
       if (account.getBalance() < transaction.getAmount()) {
@@ -138,8 +173,8 @@ public class TransactionServiceImpl implements TransactionService {
     transaction.setAccount(account);
   }
 
-  private void updateAccountBalance(Transaction existing, Transaction updated) {
-    Account account = existing.getAccount();
+  private void updateAccountBalance(com.bank.model.Transaction existing, TransactionDto updatedDTO) {
+    var account = existing.getAccount();
 
     // Revert existing transaction effect
     if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(existing.getTransactionType())) {
@@ -149,39 +184,39 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     // Apply new transaction effect
-    if (updated.getAmount() != null && updated.getTransactionType() != null) {
-      if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(updated.getTransactionType())) {
-        account.setBalance(account.getBalance() + updated.getAmount());
+    if (updatedDTO.getAmount() != null && updatedDTO.getTransactionType() != null) {
+      if (TRANSACTION_TYPE_DEBIT.equalsIgnoreCase(updatedDTO.getTransactionType())) {
+        account.setBalance(account.getBalance() + updatedDTO.getAmount());
       } else {
-        if (account.getBalance() < updated.getAmount()) {
+        if (account.getBalance() < updatedDTO.getAmount()) {
           throw new ValidationException("Insufficient funds for debit transaction");
         }
-        account.setBalance(account.getBalance() - updated.getAmount());
+        account.setBalance(account.getBalance() - updatedDTO.getAmount());
       }
     }
 
     accountRepository.save(account);
   }
 
-  private void updateTransactionFields(Transaction existing, Transaction updated) {
-    if (updated.getAmount() != null) {
-      existing.setAmount(updated.getAmount());
+  private void updateTransactionFields(com.bank.model.Transaction existing, TransactionDto updatedDTO) {
+    if (updatedDTO.getAmount() != null) {
+      existing.setAmount(updatedDTO.getAmount());
     }
-    if (updated.getTransactionType() != null) {
-      existing.setTransactionType(updated.getTransactionType());
+    if (updatedDTO.getTransactionType() != null) {
+      existing.setTransactionType(updatedDTO.getTransactionType());
     }
-    if (updated.getDescription() != null) {
-      existing.setDescription(updated.getDescription());
+    if (updatedDTO.getDescription() != null) {
+      existing.setDescription(updatedDTO.getDescription());
     }
-    if (updated.getAccountId() != null) {
-      Account newAccount = accountRepository.findById(updated.getAccountId())
+    if (updatedDTO.getAccountId() != null) {
+      var newAccount = accountRepository.findById(updatedDTO.getAccountId())
               .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
       existing.setAccount(newAccount);
     }
   }
 
-  private void revertAccountBalance(Transaction transaction) {
-    Account account = transaction.getAccount();
+  private void revertAccountBalance(com.bank.model.Transaction transaction) {
+    var account = transaction.getAccount();
 
     if (TRANSACTION_TYPE_CREDIT.equalsIgnoreCase(transaction.getTransactionType())) {
       if (account.getBalance() < transaction.getAmount()) {

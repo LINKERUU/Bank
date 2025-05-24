@@ -1,144 +1,215 @@
 package com.bank.service.impl;
 
+import com.bank.dto.CardDto;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
+import com.bank.model.Account;
 import com.bank.model.Card;
+import com.bank.repository.AccountRepository;
 import com.bank.repository.CardRepository;
 import com.bank.service.CardService;
 import com.bank.utils.InMemoryCache;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
- * Implementation of {@link CardService} that provides business logic
- * for managing bank cards with caching support.
- * Handles CRUD operations for cards while maintaining cache consistency.
+ * Implementation of {@link CardService} providing card-related operations.
  */
 @Service
 public class CardServiceImpl implements CardService {
 
   private final CardRepository cardRepository;
-  private final InMemoryCache<Long, Card> cardCache;
+  private final AccountRepository accountRepository;
+  private final InMemoryCache<Long, CardDto> cardCache;
 
   /**
-   * Constructs a CardServiceImpl with required dependencies.
+   * Constructs a new CardServiceImpl with required dependencies.
    *
-   * @param cardRepository the repository for card data access
-   * @param cardCache the in-memory cache for card entities
+   * @param cardRepository the card repository
+   * @param accountRepository the account repository
+   * @param cardCache the card cache
    */
   @Autowired
   public CardServiceImpl(CardRepository cardRepository,
-                         InMemoryCache<Long, Card> cardCache) {
+                         AccountRepository accountRepository,
+                         InMemoryCache<Long, CardDto> cardCache) {
     this.cardRepository = cardRepository;
+    this.accountRepository = accountRepository;
     this.cardCache = cardCache;
   }
 
+  /**
+   * Retrieves all cards as DTOs.
+   *
+   * @return list of card DTOs
+   */
   @Override
   @Transactional(readOnly = true)
-  public List<Card> findAllCards() {
-    // Не кэшируем список карт, так как он часто меняется
-    return cardRepository.findAll();
+  public List<CardDto> findAllCards() {
+    return cardRepository.findAll().stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
   }
 
+  /**
+   * Finds a card by ID.
+   *
+   * @param id the card ID
+   * @return optional containing the card DTO if found
+   */
   @Override
   @Transactional(readOnly = true)
-  public Optional<Card> findCardById(Long id) {
-    Card cachedCard = cardCache.get(id);
+  public Optional<CardDto> findCardById(Long id) {
+    CardDto cachedCard = cardCache.get(id);
     if (cachedCard != null) {
       return Optional.of(cachedCard);
     }
 
-    Optional<Card> card = cardRepository.findById(id);
+    Optional<CardDto> card = cardRepository.findById(id)
+            .map(this::convertToDto);
     card.ifPresent(c -> cardCache.put(id, c));
     return card;
   }
 
+  /**
+   * Creates a new card.
+   *
+   * @param cardDto the card DTO to create
+   * @return the created card DTO
+   * @throws ValidationException if validation fails
+   */
   @Override
-  public Card createCard(Card card) {
-    // Валидация номера карты
-    if (card.getCardNumber() == null || card.getCardNumber().length() != 16) {
-      throw new ValidationException("Card number must be 16 digits");
-    }
+  @Transactional
+  public CardDto createCard(CardDto cardDto) {
+    validateCard(cardDto);
+    Card card = convertToEntity(cardDto);
 
-    // Дополнительные проверки
-    validateExpirationDate(card);
-    validateCvv(card.getCvv());
+    Account account = accountRepository.findById(cardDto.getAccountId())
+            .orElseThrow(() -> new ValidationException(
+                    "Account not found with id: " + cardDto.getAccountId()));
+    card.setAccount(account);
 
     Card savedCard = cardRepository.save(card);
-    cardCache.put(savedCard.getId(), savedCard);
-    return savedCard;
-  }
-
-  @Override
-  @Transactional
-  public List<Card> createCards(List<Card> cards) {
-    cards.forEach(this::validateCard);
-    List<Card> savedCards = cardRepository.saveAll(cards);
-    savedCards.forEach(c -> cardCache.put(c.getId(), c));
-    return savedCards;
-  }
-
-  @Override
-  @Transactional
-  public Card updateCard(Long id, Card card) {
-    Card existingCard = cardRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Card with ID " + id + " not found"));
-
-    if (card.getCardNumber() != null) {
-      validateCardNumber(card.getCardNumber());
-      existingCard.setCardNumber(card.getCardNumber());
-    }
-    if (card.getExpirationDate() != null) {
-      validateExpirationDate(card.getExpirationDate());
-      existingCard.setExpirationDate(card.getExpirationDate());
-    }
-    if (card.getCvv() != null) {
-      validateCvv(card.getCvv());
-      existingCard.setCvv(card.getCvv());
-    }
-
-    Card savedCard = cardRepository.save(existingCard);
-    cardCache.put(id, savedCard);
-    return savedCard;
+    CardDto savedCardDto = convertToDto(savedCard);
+    cardCache.put(savedCardDto.getId(), savedCardDto);
+    return savedCardDto;
   }
 
   /**
-   * Validates a card object for required fields and proper formatting.
+   * Creates multiple cards.
    *
-   * @param card the card to validate
-   * @throws ValidationException if the card is null or contains invalid data
+   * @param cardsDto list of card DTOs to create
+   * @return list of created card DTOs
+   * @throws ValidationException if validation fails
    */
-  public void validateCard(Card card) {
-    if (card == null) {
+  @Override
+  @Transactional
+  public List<CardDto> createCards(List<CardDto> cardsDto) {
+    cardsDto.forEach(this::validateCard);
+
+    List<Card> cards = cardsDto.stream()
+            .map(dto -> {
+              Card card = convertToEntity(dto);
+              Account account = accountRepository.findById(dto.getAccountId())
+                      .orElseThrow(() -> new ValidationException(
+                              "Account not found with id: " + dto.getAccountId()));
+              card.setAccount(account);
+              return card;
+            })
+            .collect(Collectors.toList());
+
+    List<Card> savedCards = cardRepository.saveAll(cards);
+    List<CardDto> savedCardsDto = savedCards.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+
+    savedCardsDto.forEach(c -> cardCache.put(c.getId(), c));
+    return savedCardsDto;
+  }
+
+  /**
+   * Updates an existing card.
+   *
+   * @param id the card ID to update
+   * @param cardDto the card DTO with updated data
+   * @return the updated card DTO
+   * @throws ResourceNotFoundException if card not found
+   * @throws ValidationException if validation fails
+   */
+  @Override
+  @Transactional
+  public CardDto updateCard(Long id, CardDto cardDto) {
+    Card existingCard = cardRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                    "Card with ID " + id + " not found"));
+
+    if (cardDto.getCardNumber() != null) {
+      validateCardNumber(cardDto.getCardNumber());
+      existingCard.setCardNumber(cardDto.getCardNumber());
+    }
+    if (cardDto.getExpirationDate() != null) {
+      validateExpirationDate(cardDto.getExpirationDate());
+      existingCard.setExpirationDate(cardDto.getExpirationDate());
+    }
+    if (cardDto.getCvv() != null) {
+      validateCvv(cardDto.getCvv());
+      existingCard.setCvv(cardDto.getCvv());
+    }
+    if (cardDto.getAccountId() != null
+            && (existingCard.getAccount() == null
+            || !existingCard.getAccount().getId().equals(cardDto.getAccountId()))) {
+      Account account = accountRepository.findById(cardDto.getAccountId())
+              .orElseThrow(() -> new ValidationException(
+                      "Account not found with id: " + cardDto.getAccountId()));
+      existingCard.setAccount(account);
+    }
+
+    Card updatedCard = cardRepository.save(existingCard);
+    CardDto updatedCardDto = convertToDto(updatedCard);
+    cardCache.put(id, updatedCardDto);
+    return updatedCardDto;
+  }
+
+  private CardDto convertToDto(Card card) {
+    CardDto cardDto = new CardDto();
+    cardDto.setId(card.getId());
+    cardDto.setCardNumber(card.getCardNumber());
+    cardDto.setExpirationDate(card.getExpirationDate());
+    cardDto.setCvv(card.getCvv());
+    cardDto.setAccountId(card.getAccount().getId());
+    cardDto.setAccountNumber(card.getAccount().getAccountNumber());
+    return cardDto;
+  }
+
+  private Card convertToEntity(CardDto cardDto) {
+    Card card = new Card();
+    card.setId(cardDto.getId());
+    card.setCardNumber(cardDto.getCardNumber());
+    card.setExpirationDate(cardDto.getExpirationDate());
+    card.setCvv(cardDto.getCvv());
+    return card;
+  }
+
+  private void validateCard(CardDto cardDto) {
+    if (cardDto == null) {
       throw new ValidationException("Card cannot be null");
     }
 
-    validateCardNumber(card.getCardNumber());
-    validateExpirationDate(card.getExpirationDate());
-    validateCvv(card.getCvv());
+    validateCardNumber(cardDto.getCardNumber());
+    validateExpirationDate(cardDto.getExpirationDate());
+    validateCvv(cardDto.getCvv());
 
-    if (card.getAccount() == null) {
+    if (cardDto.getAccountId() == null) {
       throw new ValidationException("The card must be linked to the account");
-    }
-
-    if (cardRepository.existsById(Long.valueOf(card.getCardNumber()))) {
-      throw new ValidationException("A card with this number already exists");
     }
   }
 
-
-  /**
-   * Validates a card number using the Luhn algorithm and checks for proper length.
-   *
-   * @param cardNumber the card number to validate
-   * @throws ValidationException if the card number is null, empty, or invalid
-   */
-  public void validateCardNumber(String cardNumber) {
+  private void validateCardNumber(String cardNumber) {
     if (cardNumber == null) {
       throw new ValidationException("Card number cannot be null");
     }
@@ -147,14 +218,7 @@ public class CardServiceImpl implements CardService {
     }
   }
 
-
-  /**
-   * Validates a card's expiration date to ensure it's not in the past.
-   *
-   * @param expirationDate the expiration date to validate
-   * @throws ValidationException if the date is null or expired
-   */
-  public void validateExpirationDate(YearMonth expirationDate) {
+  private void validateExpirationDate(YearMonth expirationDate) {
     if (expirationDate == null) {
       throw new ValidationException("Expiration date cannot be null");
     }
@@ -163,21 +227,7 @@ public class CardServiceImpl implements CardService {
     }
   }
 
-
-  private void validateExpirationDate(Card card) {
-    if (card.getExpirationDate() == null || card.getExpirationDate().isBefore(YearMonth.now())) {
-      throw new ValidationException("Invalid expiration date");
-    }
-  }
-
-
-  /**
-   * Validates a card's CVV code to ensure it's 3 or 4 digits.
-   *
-   * @param cvv the CVV code to validate
-   * @throws ValidationException if the CVV is null, empty, or invalid
-   */
-  public void validateCvv(String cvv) {
+  private void validateCvv(String cvv) {
     if (cvv == null) {
       throw new ValidationException("CVV cannot be null");
     }
@@ -186,6 +236,12 @@ public class CardServiceImpl implements CardService {
     }
   }
 
+  /**
+   * Deletes a card by ID.
+   *
+   * @param id the card ID to delete
+   * @throws ResourceNotFoundException if card not found
+   */
   @Override
   @Transactional
   public void deleteCard(Long id) {

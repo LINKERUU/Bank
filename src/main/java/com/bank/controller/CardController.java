@@ -1,6 +1,6 @@
 package com.bank.controller;
 
-import com.bank.model.Card;
+import com.bank.dto.CardDto;
 import com.bank.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -24,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
- * Controller for managing bank cards.
+ * Controller for handling card-related operations.
+ * Provides endpoints for CRUD operations on bank cards.
  */
 @RestController
 @RequestMapping("/api/cards")
@@ -36,9 +35,8 @@ public class CardController {
   private final CardService cardService;
 
   /**
-   * Constructs a new CardController with the specified CardService.
+   * Retrieves all cards.
    *
-   * @param cardService the card service to be used by this controller
    */
   public CardController(CardService cardService) {
     this.cardService = cardService;
@@ -47,13 +45,13 @@ public class CardController {
   /**
    * Retrieves all cards.
    *
-   * @return a list of all cards
+   * @return list of all card DTOs
    */
   @Operation(summary = "Получить все карты",
           description = "Возвращает список всех банковских карт")
   @ApiResponse(responseCode = "200", description = "Карты успешно получены")
   @GetMapping
-  public List<Card> findAllCards() {
+  public List<CardDto> findAllCards() {
     return cardService.findAllCards();
   }
 
@@ -61,79 +59,80 @@ public class CardController {
    * Retrieves a card by its ID.
    *
    * @param id the ID of the card to retrieve
-   * @return an {@link Optional} containing the card if found, otherwise empty
+   * @return ResponseEntity containing the card DTO if found, or 404 if not found
    */
   @Operation(summary = "Получить карту по ID",
           description = "Возвращает карту по ее идентификатору")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Карта найдена"),
-      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    @ApiResponse(responseCode = "200", description = "Карта найдена"),
+    @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<Card> getCardById(@PathVariable Long id) {
+  public ResponseEntity<CardDto> getCardById(@PathVariable Long id) {
     return cardService.findCardById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
   }
+
   /**
    * Creates a new card.
    *
-   * @param card the card to create
-   * @return the created card
+   * @param cardDto the card data to create
+   * @param bindingResult the binding result for validation
+   * @return ResponseEntity containing the created card DTO or error messages
    */
-
   @Operation(summary = "Создать новую карту",
           description = "Создает новую банковскую карту")
   @ApiResponse(responseCode = "201", description = "Карта успешно создана")
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
-  public ResponseEntity<Card> createCard(@Valid @RequestBody Card card,
-                                         BindingResult bindingResult) {
+  public ResponseEntity<CardDto> createCard(@Valid @RequestBody CardDto cardDto,
+                                            BindingResult bindingResult) {
 
     if (bindingResult.hasErrors()) {
       List<String> errors = bindingResult.getFieldErrors()
               .stream()
               .map(FieldError::getDefaultMessage)
               .toList();
-      return ResponseEntity.badRequest().body((Card) Map.of("errors", errors));
+      return ResponseEntity.badRequest().body((CardDto) Map.of("errors", errors));
     }
 
-    Card createdCard = cardService.createCard(card);
+    CardDto createdCard = cardService.createCard(cardDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdCard);
   }
-
 
   /**
    * Creates multiple cards in a batch.
    *
-   * @param cards the list of cards to create
-   * @return the list of created cards
+   * @param cards list of card DTOs to create
+   * @return list of created card DTOs
    */
   @Operation(summary = "Массовое создание карт",
           description = "Создает несколько карт одновременно")
   @ApiResponse(responseCode = "201", description = "Карты успешно созданы")
   @PostMapping("/batch")
   @ResponseStatus(HttpStatus.CREATED)
-  public List<Card> createCards(@RequestBody List<Card> cards) {
+  public List<CardDto> createCards(@RequestBody List<CardDto> cards) {
     return cardService.createCards(cards);
   }
 
   /**
    * Updates an existing card.
    *
-   * @param id   the ID of the card to update
-   * @param card the updated card details
-   * @return the updated card
+   * @param id the ID of the card to update
+   * @param cardDto the updated card data
+   * @return ResponseEntity containing the updated card DTO
    */
   @Operation(summary = "Обновить карту", description = "Обновляет существующую карту")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Карта успешно обновлена"),
-      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    @ApiResponse(responseCode = "200", description = "Карта успешно обновлена"),
+    @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @PutMapping("/{id}")
-  public ResponseEntity<Card> updateCard(@PathVariable Long id, @Valid @RequestBody Card card) {
+  public ResponseEntity<CardDto> updateCard(@PathVariable Long id,
+                                            @Valid @RequestBody CardDto cardDto) {
     try {
-      Card updatedCard = cardService.updateCard(id, card);
+      CardDto updatedCard = cardService.updateCard(id, cardDto);
       return ResponseEntity.ok(updatedCard);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Invalid card data: " + e.getMessage());
@@ -147,8 +146,8 @@ public class CardController {
    */
   @Operation(summary = "Удалить карту", description = "Удаляет карту по ее ID")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "Карта успешно удалена"),
-      @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    @ApiResponse(responseCode = "204", description = "Карта успешно удалена"),
+    @ApiResponse(responseCode = "404", description = "Карта не найдена")
   })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

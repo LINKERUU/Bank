@@ -1,5 +1,7 @@
 package com.bank.service.impl;
 
+import com.bank.dto.AccountDto;
+import com.bank.dto.UserDto;
 import com.bank.exception.ResourceNotFoundException;
 import com.bank.exception.ValidationException;
 import com.bank.model.Account;
@@ -9,17 +11,15 @@ import com.bank.repository.UserRepository;
 import com.bank.service.PasswordService;
 import com.bank.service.UserService;
 import com.bank.utils.InMemoryCache;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Implementation of the UserService interface providing CRUD operations for User entities.
- * This service handles user management including creation, retrieval, update, and deletion,
- * with proper validation and caching mechanisms.
- */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -30,11 +30,6 @@ public class UserServiceImpl implements UserService {
   private final AccountRepository accountRepository;
   private final InMemoryCache<Long, User> userCache;
 
-  /**
-   * Constructs a new UserServiceImpl with required repositories.
-   *
-   * @param userRepository repository for transaction data access
-   */
   @Autowired
   public UserServiceImpl(UserRepository userRepository,
                          PasswordService passwordService,
@@ -48,59 +43,134 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<User> findAllUsers() {
-    return userRepository.findAll();
+  public List<UserDto> findAllUsers() {
+    return userRepository.findAll().stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
   }
 
   @Override
-  public Optional<User> findUserById(Long id) {
-    // 1. Проверка кэша
+  @Transactional(readOnly = true)
+  public Optional<UserDto> findUserById(Long id) {
     User cachedUser = userCache.get(id);
     if (cachedUser != null) {
-      return Optional.of(cachedUser); // Возвращаем из кэша
+      return Optional.of(convertToDto(cachedUser));
     }
 
-    // 2. Если нет в кэше, ищем в репозитории
-    Optional<User> user = userRepository.findById(id);
-    user.ifPresent(u -> userCache.put(id, u)); // Кэшируем найденного пользователя
-
-    return user;
+    return userRepository.findById(id)
+            .map(user -> {
+              userCache.put(id, user);
+              return convertToDto(user);
+            });
   }
 
   @Override
   @Transactional
-  public User createUser(User user) {
+  public UserDto createUser(UserDto userDTO) {
+    User user = convertToEntity(userDTO);
     validateUser(user);
     user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
     User savedUser = userRepository.save(user);
     userCache.put(savedUser.getId(), savedUser);
-    return savedUser;
+    return convertToDto(savedUser);
   }
+
+
 
   @Override
   @Transactional
-  public List<User> createUsers(List<User> users) {
-    users.forEach(this::validateUser);
-    users.forEach(user ->
-            user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()))
-    );
+  public List<UserDto> createUsers(List<UserDto> usersDTO) {
+    List<User> users = usersDTO.stream()
+            .map(this::convertToEntity)
+            .peek(this::validateUser)
+            .peek(user -> user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash())))
+            .collect(Collectors.toList());
+
     List<User> savedUsers = userRepository.saveAll(users);
     savedUsers.forEach(user -> userCache.put(user.getId(), user));
-    return savedUsers;
+    return savedUsers.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
   }
 
   @Override
   @Transactional
-  public User updateUser(Long id, User updatedUser) {
+  public UserDto updateUser(Long id, UserDto userDTO) {
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
+    User updatedUser = convertToEntity(userDTO);
     validateUserForUpdate(updatedUser, existingUser);
     updateUserFields(existingUser, updatedUser);
 
     User savedUser = userRepository.save(existingUser);
     userCache.put(id, savedUser);
-    return savedUser;
+    return convertToDto(savedUser);
+  }
+
+  @Override
+  @Transactional
+  public void deleteUser(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+    for (Account account : user.getAccounts()) {
+      // Убедимся, что createdAt установлен
+      if (account.getCreatedAt() == null) {
+        account.setCreatedAt(LocalDateTime.now());
+      }
+      account.getUsers().remove(user);
+      if (account.getUsers().isEmpty()) {
+        accountRepository.delete(account);
+      }
+    }
+
+    userRepository.delete(user);
+    userCache.evict(userId);
+  }
+
+  private UserDto convertToDto(User user) {
+    UserDto userDto = new UserDto();
+    userDto.setId(user.getId());
+    userDto.setFirstName(user.getFirstName());
+    userDto.setLastName(user.getLastName());
+    userDto.setEmail(user.getEmail());
+    userDto.setPhone(user.getPhone());
+    userDto.setCreatedAt(user.getCreatedAt());
+
+    if (user.getAccounts() != null) {
+      Set<AccountDto> accountDtos = user.getAccounts().stream()
+              .map(this::convertAccountToDto)
+              .collect(Collectors.toSet());
+      userDto.setAccounts(accountDtos);
+    }
+
+    return userDto;
+  }
+
+  private AccountDto convertAccountToDto(Account account) {
+    AccountDto accountDto = new AccountDto();
+    accountDto.setId(account.getId());
+    accountDto.setAccountNumber(account.getAccountNumber());
+    accountDto.setBalance(account.getBalance());
+    accountDto.setCreatedAt(account.getCreatedAt() != null ?
+            account.getCreatedAt() :
+            LocalDateTime.now());
+    return accountDto;
+  }
+
+  private User convertToEntity(UserDto userDto) {
+    User user = new User();
+    user.setId(userDto.getId());
+    user.setFirstName(userDto.getFirstName());
+    user.setLastName(userDto.getLastName());
+    user.setEmail(userDto.getEmail());
+    user.setPhone(userDto.getPhone());
+    user.setPasswordHash(userDto.getPasswordHash());
+    user.setCreatedAt(userDto.getCreatedAt() != null ?
+            userDto.getCreatedAt() :
+            LocalDateTime.now());
+    return user;
   }
 
   private void validateUser(User user) {
@@ -134,13 +204,13 @@ public class UserServiceImpl implements UserService {
   private void validateUserForUpdate(User updatedUser, User existingUser) {
     if (updatedUser.getEmail() != null
             && !updatedUser.getEmail().equals(existingUser.getEmail())
-            && userRepository.existsByEmail(updatedUser.getEmail())) {  // Changed from existsById
+            && userRepository.existsByEmail(updatedUser.getEmail())) {
       throw new ValidationException("User with this email already exists");
     }
 
     if (updatedUser.getPhone() != null
             && !updatedUser.getPhone().equals(existingUser.getPhone())
-            && userRepository.existsByPhone(updatedUser.getPhone())) {  // Changed from existsById
+            && userRepository.existsByPhone(updatedUser.getPhone())) {
       throw new ValidationException("User with this phone already exists");
     }
 
@@ -150,30 +220,24 @@ public class UserServiceImpl implements UserService {
   }
 
   private void validatePasswordStrength(String password) {
-    // Check length first
     if (password.length() < 8) {
       throw new ValidationException("Password must be at least 8 characters long");
     }
 
-    // Check for at least one uppercase letter (English and Cyrillic)
     if (!containsUppercase(password)) {
       throw new ValidationException("Password must contain at least one uppercase letter");
     }
 
-    // Check for at least one digit (using \\d)
     if (!containsDigit(password)) {
       throw new ValidationException("Password must contain at least one digit");
     }
 
-    // Check for at least one special character
     if (!containsSpecialChar(password)) {
       throw new ValidationException("Password must contain at least one special character");
     }
   }
 
-  // Optimized regex checks with no catastrophic backtracking potential
   private boolean containsUppercase(String password) {
-    // Simple character check without regex
     for (char c : password.toCharArray()) {
       if (Character.isUpperCase(c)) {
         return true;
@@ -183,7 +247,6 @@ public class UserServiceImpl implements UserService {
   }
 
   private boolean containsDigit(String password) {
-    // Simple character check without regex
     for (char c : password.toCharArray()) {
       if (Character.isDigit(c)) {
         return true;
@@ -193,7 +256,6 @@ public class UserServiceImpl implements UserService {
   }
 
   private boolean containsSpecialChar(String password) {
-    // Defined set of special characters
     String specialChars = "!@#$%^&*()_+-=[]{};':\"\\|,.<>?";
     for (char c : password.toCharArray()) {
       if (specialChars.indexOf(c) >= 0) {
@@ -201,23 +263,6 @@ public class UserServiceImpl implements UserService {
       }
     }
     return false;
-  }
-
-  @Override
-  @Transactional
-  public void deleteUser(Long userId) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-
-    for (Account account : user.getAccounts()) {
-      account.getUsers().remove(user);
-      if (account.getUsers().isEmpty()) {
-        accountRepository.delete(account);
-      }
-    }
-
-    userRepository.delete(user);
-    userCache.evict(userId);
   }
 
   private void updateUserFields(User existing, User updated) {

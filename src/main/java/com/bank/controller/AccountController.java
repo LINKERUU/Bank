@@ -1,6 +1,6 @@
 package com.bank.controller;
 
-import com.bank.model.Account;
+import com.bank.dto.AccountDto;
 import com.bank.service.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,9 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
- * Controller for managing bank accounts.
+ * Контроллер для управления банковскими счетами.
+ * Предоставляет API для создания, чтения, обновления и удаления счетов.
  */
 @RestController
 @RequestMapping("/api/accounts")
@@ -34,79 +34,80 @@ public class AccountController {
   private final AccountService accountService;
 
   /**
-   * Constructor.
+   * Конструктор контроллера счетов.
+   *
+   * @param accountService сервис для работы со счетами
    */
-
   public AccountController(AccountService accountService) {
     this.accountService = accountService;
   }
 
   /**
-   * Retrieves all accounts.
+   * Получает список всех банковских счетов.
    *
-   * @return a list of all accounts
+   * @return список всех счетов
    */
   @Operation(summary = "Получить все счета",
           description = "Возвращает список всех банковских счетов")
   @ApiResponse(responseCode = "200", description = "Счета успешно получены")
   @GetMapping
-  public List<Account> findAllAccounts() {
+  public List<AccountDto> findAllAccounts() {
     return accountService.findAllAccounts();
   }
 
   /**
-   * Retrieves an account by its ID.
+   * Получает счет по его идентификатору.
    *
-   * @param id the ID of the account to retrieve
-   * @return the account with the specified ID, if found
+   * @param id идентификатор счета
+   * @return Optional с найденным счетом
    */
   @Operation(summary = "Получить счет по ID", description = "Возвращает счет по его идентификатору")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Счет найден"),
-      @ApiResponse(responseCode = "404", description = "Счет не найден")
+    @ApiResponse(responseCode = "200", description = "Счет найден"),
+    @ApiResponse(responseCode = "404", description = "Счет не найден")
   })
   @GetMapping("/{id}")
-  public Optional<Account> findAccountById(@PathVariable Long id) {
+  public Optional<AccountDto> findAccountById(@PathVariable Long id) {
     return accountService.findAccountById(id);
   }
 
   /**
-   * Creates a new account.
+   * Создает новый банковский счет.
    *
-   * @param account the account to create
-   * @return the created account
+   * @param accountDto данные для создания счета
+   * @return созданный счет
    */
   @Operation(summary = "Создать новый счет", description = "Создает новый банковский счет")
   @ApiResponse(responseCode = "201", description = "Счет успешно создан")
   @ApiResponse(responseCode = "400", description = "Некорректные данные")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<Account> createAccount(@Valid @RequestBody Account account) {
-    Account createdAccount = accountService.createAccount(account);
+  public ResponseEntity<AccountDto> createAccount(@Valid @RequestBody AccountDto accountDto) {
+    AccountDto createdAccount = accountService.createAccount(accountDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
   }
 
   /**
-   * Creates multiple accounts in a batch.
+   * Создает несколько счетов одновременно.
    *
-   * @param accounts the list of accounts to create
-   * @return the list of created accounts
+   * @param accountsDto список счетов для создания
+   * @return список созданных счетов
    */
   @Operation(summary = "Массовое создание счетов",
           description = "Создает несколько счетов одновременно")
   @ApiResponse(responseCode = "201", description = "Счета успешно созданы")
   @PostMapping("/batch")
   @ResponseStatus(HttpStatus.CREATED)
-  public List<Account> createAccounts(@RequestBody List<Account> accounts) {
-    return accountService.createAccounts(accounts);
+  public List<AccountDto> createAccounts(@RequestBody List<AccountDto> accountsDto) {
+    return accountService.createAccounts(accountsDto);
   }
 
   /**
-   * Updates an existing account.
+   * Обновляет существующий счет.
    *
-   * @param id      the ID of the account to update
-   * @param account the updated account details
-   * @return the updated account
+   * @param id идентификатор счета
+   * @param accountDto новые данные счета
+   * @return обновленный счет
    */
   @Operation(summary = "Обновить счет", description = "Обновляет существующий счет")
   @ApiResponses(value = {
@@ -114,14 +115,14 @@ public class AccountController {
       @ApiResponse(responseCode = "404", description = "Счет не найден")
   })
   @PutMapping("/{id}")
-  public Account updateAccount(@PathVariable Long id, @RequestBody Account account) {
-    return accountService.updateAccount(id, account);
+  public AccountDto updateAccount(@PathVariable Long id, @RequestBody AccountDto accountDto) {
+    return accountService.updateAccount(id, accountDto);
   }
 
   /**
-   * Deletes an account by its ID.
+   * Удаляет счет по его идентификатору.
    *
-   * @param id the ID of the account to delete
+   * @param id идентификатор счета для удаления
    */
   @Operation(summary = "Удалить счет", description = "Удаляет счет по его ID")
   @ApiResponses(value = {
@@ -135,28 +136,32 @@ public class AccountController {
   }
 
   /**
-   * Retrieves accounts associated with a specific user email.
+   * Получает счета по email пользователя.
    *
-   * @param email the email of the user to filter accounts by
-   * @return a list of accounts associated with the specified email
+   * @param email email пользователя
+   * @return список счетов пользователя
    */
   @Operation(summary = "Получить счета по email пользователя",
           description = "Возвращает счета, связанные с email пользователя")
   @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Счета найдены"),
-      @ApiResponse(responseCode = "404", description = "Счета не найдены")
+    @ApiResponse(responseCode = "200", description = "Счета найдены"),
+    @ApiResponse(responseCode = "404", description = "Счета не найдены")
   })
   @GetMapping("/by-email")
-  public ResponseEntity<List<Account>> getAccountsByUserEmail(@RequestParam String email) {
+  public ResponseEntity<List<AccountDto>> getAccountsByUserEmail(@RequestParam String email) {
     return ResponseEntity.ok(accountService.findByUserEmail(email));
   }
 
+  /**
+   * Получает счета, к которым привязаны карты.
+   *
+   * @return список счетов с картами
+   */
   @Operation(summary = "Получить счета с картами",
           description = "Возвращает счета, к которым привязаны карты")
   @ApiResponse(responseCode = "200", description = "Счета с картами найдены")
   @GetMapping("/with-cards")
-  public ResponseEntity<List<Account>> getAccountsWithCards() {
+  public ResponseEntity<List<AccountDto>> getAccountsWithCards() {
     return ResponseEntity.ok(accountService.findAccountsWithCards());
   }
-
 }

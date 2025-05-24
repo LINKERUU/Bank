@@ -49,4 +49,6 @@ public class Card {
   @JoinColumn(name = "account_id", nullable = false)
   @NotNull(message = "Card must be linked to an account")
   private Account account;
+
+
 }

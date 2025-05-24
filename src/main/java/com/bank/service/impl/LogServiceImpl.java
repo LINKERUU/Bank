@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class LogServiceImpl implements LogService {
@@ -136,7 +137,20 @@ public class LogServiceImpl implements LogService {
 
   @Override
   public String viewLogsByDate(String date) {
-    return "";
+    try {
+      Path logPath = Paths.get(MAIN_LOG_FILE);
+      if (!Files.exists(logPath)) {
+        throw new IOException("Main log file not found");
+      }
+
+      try (Stream<String> lines = Files.lines(logPath)) {
+        return lines
+                .filter(line -> line.contains(date))
+                .collect(Collectors.joining("\n"));
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Error viewing logs", e);
+    }
   }
 
   private void updateStatus(String taskId, TaskStatus status) {

@@ -19,8 +19,15 @@ public class BankApplication {
    *
    * @param args command-line arguments
    */
-  public static void main(final String[] args) {
-    SpringApplication.run(BankApplication.class, args);
+  public static void main(String[] args) {
+    try {
+      SpringApplication.run(BankApplication.class, args);
+      System.out.println("Application started successfully!");
+    } catch (Exception e) {
+      System.err.println("Application failed to start:");
+      e.printStackTrace();
+      System.exit(1);
+    }
   }
 
 }

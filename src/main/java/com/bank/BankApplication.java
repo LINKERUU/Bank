@@ -16,16 +16,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class BankApplication {
   static {
-    // Для диагностики deadlock
-    Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-      System.err.println("Uncaught exception in thread: " + t.getName());
-      e.printStackTrace();
-    });
+    System.setProperty("tomcat.util.compat.JreCompat.skipJre22Check", "true");
   }
 
   public static void main(String[] args) {
-    new SpringApplicationBuilder(BankApplication.class)
-            .listeners(new ApplicationPidFileWriter())
-            .run(args);
+    SpringApplication.run(BankApplication.class, args);
   }
 }

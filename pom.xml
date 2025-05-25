@@ -32,9 +32,6 @@
         <sonar.projectKey>LINKERUU_Bank</sonar.projectKey>
         <!--suppress UnresolvedMavenProperty -->
         <sonar.login>${SONAR_TOKEN}</sonar.login>
-        <java.version>22</java.version>
-        <maven.compiler.source>22</maven.compiler.source>
-        <maven.compiler.target>22</maven.compiler.target>
         <sonar.coverage.exclusions>
             **/aspect/**,
             **/config/**,

@@ -2,6 +2,8 @@ package com.bank;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -13,21 +15,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy
 @SpringBootApplication
 public class BankApplication {
-
-  /**
-   * Entry point of the application.
-   *
-   * @param args command-line arguments
-   */
-  public static void main(String[] args) {
-    try {
-      SpringApplication.run(BankApplication.class, args);
-      System.out.println("Application started successfully!");
-    } catch (Exception e) {
-      System.err.println("Application failed to start:");
+  static {
+    // Для диагностики deadlock
+    Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+      System.err.println("Uncaught exception in thread: " + t.getName());
       e.printStackTrace();
-      System.exit(1);
-    }
+    });
   }
 
+  public static void main(String[] args) {
+    new SpringApplicationBuilder(BankApplication.class)
+            .listeners(new ApplicationPidFileWriter())
+            .run(args);
+  }
 }

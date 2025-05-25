@@ -1,4 +1,3 @@
-// TransactionController.java
 package com.bank.controller;
 
 import com.bank.dto.TransactionDto;
@@ -24,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Controller for handling transactions.
+ */
 @RestController
 @RequestMapping("/api/transactions")
 @Tag(name = "Transaction Controller", description = "API для работы с транзакциями")
@@ -31,10 +33,20 @@ public class TransactionController {
 
   private final TransactionService transactionService;
 
+  /**
+   * Constructor for TransactionController.
+   *
+   * @param transactionService the transaction service
+   */
   public TransactionController(TransactionService transactionService) {
     this.transactionService = transactionService;
   }
 
+  /**
+   * Get all transactions.
+   *
+   * @return list of all transactions
+   */
   @Operation(summary = "Get all transactions",
           description = "Returns a list of all bank transactions")
   @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
@@ -43,12 +55,18 @@ public class TransactionController {
     return ResponseEntity.ok(transactionService.findAllTransactions());
   }
 
+  /**
+   * Get transaction by ID.
+   *
+   * @param id transaction ID
+   * @return transaction DTO
+   */
   @Operation(summary = "Get transaction by ID",
           description = "Returns a transaction by its identifier")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Transaction found"),
-          @ApiResponse(responseCode = "400", description = "Invalid ID format"),
-          @ApiResponse(responseCode = "404", description = "Transaction not found")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Transaction found"),
+    @ApiResponse(responseCode = "400", description = "Invalid ID format"),
+    @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @GetMapping("/{id}")
   public TransactionDto getTransactionById(@PathVariable Long id) {
@@ -59,23 +77,28 @@ public class TransactionController {
             ));
   }
 
-  @Operation(summary = "Create new transaction",
-          description = "Creates a new transaction. Supported types: "
-                  + "'credit' (deposit), 'debit' (withdrawal)")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "201", description = "Transaction created successfully"),
-          @ApiResponse(responseCode = "400", description = "Invalid input data"),
-          @ApiResponse(responseCode = "404", description = "Account not found"),
-          @ApiResponse(responseCode = "409", description = "Insufficient funds")
+  /**
+   * Create new transaction.
+   *
+   * @param transactionDto transaction DTO
+   * @return created transaction
+   */
+  @Operation(summary = "Create new transaction", description =
+          "Creates a new transaction. Supported types: 'credit' (deposit), 'debit' (withdrawal)")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Transaction created successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+    @ApiResponse(responseCode = "404", description = "Account not found"),
+    @ApiResponse(responseCode = "409", description = "Insufficient funds")
   })
   @PostMapping
   public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody
-                                                          TransactionDto transactionDTO) {
+                                                          TransactionDto transactionDto) {
     try {
-      if (transactionDTO.getTransactionType() != null) {
-        transactionDTO.setTransactionType(transactionDTO.getTransactionType().toLowerCase());
+      if (transactionDto.getTransactionType() != null) {
+        transactionDto.setTransactionType(transactionDto.getTransactionType().toLowerCase());
       }
-      TransactionDto created = transactionService.createTransaction(transactionDTO);
+      TransactionDto created = transactionService.createTransaction(transactionDto);
       return ResponseEntity.status(HttpStatus.CREATED).body(created);
     } catch (ValidationException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
@@ -86,31 +109,41 @@ public class TransactionController {
     }
   }
 
-  @Operation(summary = "Update transaction",
-          description = "Updates an existing transaction")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
-          @ApiResponse(responseCode = "400", description = "Invalid input data"),
-          @ApiResponse(responseCode = "404", description = "Transaction not found")
+  /**
+   * Update transaction.
+   *
+   * @param id transaction ID
+   * @param transactionDto transaction DTO
+   * @return updated transaction
+   */
+  @Operation(summary = "Update transaction", description = "Updates an existing transaction")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+    @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @PutMapping("/{id}")
   public ResponseEntity<TransactionDto> updateTransaction(
           @PathVariable Long id,
-          @Valid @RequestBody TransactionDto transactionDTO) {
+          @Valid @RequestBody TransactionDto transactionDto) {
     try {
-      TransactionDto updated = transactionService.updateTransaction(id, transactionDTO);
+      TransactionDto updated = transactionService.updateTransaction(id, transactionDto);
       return ResponseEntity.ok(updated);
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
     }
   }
 
-  @Operation(summary = "Delete transaction",
-          description = "Deletes a transaction by its ID")
-  @ApiResponses(value = {
-          @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
-          @ApiResponse(responseCode = "400", description = "Invalid ID format"),
-          @ApiResponse(responseCode = "404", description = "Transaction not found")
+  /**
+   * Delete transaction by ID.
+   *
+   * @param id transaction ID
+   */
+  @Operation(summary = "Delete transaction", description = "Deletes a transaction by its ID")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid ID format"),
+    @ApiResponse(responseCode = "404", description = "Transaction not found")
   })
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)

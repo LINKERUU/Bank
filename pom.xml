@@ -48,6 +48,7 @@
             **/service/impl/LogServiceImpl.java,
             **/service/impl/VisitCounterServiceImpl.java
         </sonar.coverage.exclusions>
+        <tomcat.version>10.1.18</tomcat.version>
     </properties>
     <dependencies>
 

@@ -18,12 +18,9 @@ COPY src ./src
 RUN mvn -B package -DskipTests
 
 # Финальный образ с JRE 21
-FROM eclipse-temurin:22-jdk-alpine
-COPY target/app.jar /app/app.jar
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 
-#FROM eclipse-temurin:22-jre-jammy
+FROM eclipse-temurin:22-jre-jammy
 WORKDIR /app
-#COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-#ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

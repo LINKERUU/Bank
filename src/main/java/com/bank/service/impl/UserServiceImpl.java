@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Реализация сервиса для работы с пользователями.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -30,6 +33,14 @@ public class UserServiceImpl implements UserService {
   private final AccountRepository accountRepository;
   private final InMemoryCache<Long, User> userCache;
 
+  /**
+   * Конструктор сервиса пользователей.
+   *
+   * @param userRepository репозиторий пользователей
+   * @param passwordService сервис паролей
+   * @param accountRepository репозиторий счетов
+   * @param userCache кэш пользователей
+   */
   @Autowired
   public UserServiceImpl(UserRepository userRepository,
                          PasswordService passwordService,
@@ -41,6 +52,11 @@ public class UserServiceImpl implements UserService {
     this.userCache = userCache;
   }
 
+  /**
+   * Получает список всех пользователей.
+   *
+   * @return список пользователей
+   */
   @Override
   @Transactional(readOnly = true)
   public List<UserDto> findAllUsers() {
@@ -49,6 +65,12 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
   }
 
+  /**
+   * Находит пользователя по идентификатору.
+   *
+   * @param id идентификатор пользователя
+   * @return Optional с данными пользователя
+   */
   @Override
   @Transactional(readOnly = true)
   public Optional<UserDto> findUserById(Long id) {
@@ -64,10 +86,17 @@ public class UserServiceImpl implements UserService {
             });
   }
 
+  /**
+   * Создает нового пользователя.
+   *
+   * @param userDto данные нового пользователя
+   * @return созданный пользователь
+   * @throws ValidationException если данные пользователя неверные
+   */
   @Override
   @Transactional
-  public UserDto createUser(UserDto userDTO) {
-    User user = convertToEntity(userDTO);
+  public UserDto createUser(UserDto userDto) {
+    User user = convertToEntity(userDto);
     validateUser(user);
     user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash()));
     User savedUser = userRepository.save(user);
@@ -75,15 +104,21 @@ public class UserServiceImpl implements UserService {
     return convertToDto(savedUser);
   }
 
-
-
+  /**
+   * Массово создает пользователей.
+   *
+   * @param usersDto список пользователей для создания
+   * @return список созданных пользователей
+   * @throws ValidationException если данные пользователей неверные
+   */
   @Override
   @Transactional
-  public List<UserDto> createUsers(List<UserDto> usersDTO) {
-    List<User> users = usersDTO.stream()
+  public List<UserDto> createUsers(List<UserDto> usersDto) {
+    List<User> users = usersDto.stream()
             .map(this::convertToEntity)
             .peek(this::validateUser)
-            .peek(user -> user.setPasswordHash(passwordService.hashPassword(user.getPasswordHash())))
+            .peek(user -> user.setPasswordHash(passwordService
+                    .hashPassword(user.getPasswordHash())))
             .collect(Collectors.toList());
 
     List<User> savedUsers = userRepository.saveAll(users);
@@ -93,13 +128,22 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
   }
 
+  /**
+   * Обновляет данные пользователя.
+   *
+   * @param id идентификатор пользователя
+   * @param userDto новые данные пользователя
+   * @return обновленные данные пользователя
+   * @throws ResourceNotFoundException если пользователь не найден
+   * @throws ValidationException если данные пользователя неверные
+   */
   @Override
   @Transactional
-  public UserDto updateUser(Long id, UserDto userDTO) {
+  public UserDto updateUser(Long id, UserDto userDto) {
     User existingUser = userRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(USER_NOT_FOUND_MESSAGE + id));
 
-    User updatedUser = convertToEntity(userDTO);
+    User updatedUser = convertToEntity(userDto);
     validateUserForUpdate(updatedUser, existingUser);
     updateUserFields(existingUser, updatedUser);
 
@@ -108,6 +152,12 @@ public class UserServiceImpl implements UserService {
     return convertToDto(savedUser);
   }
 
+  /**
+   * Удаляет пользователя.
+   *
+   * @param userId идентификатор пользователя
+   * @throws ResourceNotFoundException если пользователь не найден
+   */
   @Override
   @Transactional
   public void deleteUser(Long userId) {
@@ -115,7 +165,6 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
     for (Account account : user.getAccounts()) {
-      // Убедимся, что createdAt установлен
       if (account.getCreatedAt() == null) {
         account.setCreatedAt(LocalDateTime.now());
       }
@@ -153,9 +202,9 @@ public class UserServiceImpl implements UserService {
     accountDto.setId(account.getId());
     accountDto.setAccountNumber(account.getAccountNumber());
     accountDto.setBalance(account.getBalance());
-    accountDto.setCreatedAt(account.getCreatedAt() != null ?
-            account.getCreatedAt() :
-            LocalDateTime.now());
+    accountDto.setCreatedAt(account.getCreatedAt() != null
+            ? account.getCreatedAt()
+            : LocalDateTime.now());
     return accountDto;
   }
 
@@ -167,9 +216,9 @@ public class UserServiceImpl implements UserService {
     user.setEmail(userDto.getEmail());
     user.setPhone(userDto.getPhone());
     user.setPasswordHash(userDto.getPasswordHash());
-    user.setCreatedAt(userDto.getCreatedAt() != null ?
-            userDto.getCreatedAt() :
-            LocalDateTime.now());
+    user.setCreatedAt(userDto.getCreatedAt() != null
+            ? userDto.getCreatedAt()
+            : LocalDateTime.now());
     return user;
   }
 

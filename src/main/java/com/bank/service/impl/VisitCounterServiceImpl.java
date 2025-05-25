@@ -17,7 +17,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * Implementation of {@link VisitCounterService} that maintains visit counts in memory
+ * and periodically persists them to the database.
+ */
 @Service
 @Transactional
 @Slf4j
@@ -27,12 +30,18 @@ public class VisitCounterServiceImpl implements VisitCounterService {
   private final VisitRepository visitRepository;
   private final ConcurrentHashMap<String, AtomicLong> counterCache = new ConcurrentHashMap<>();
 
+  /**
+   * Initializes the in-memory cache with data from the database.
+   */
   @Autowired
   public VisitCounterServiceImpl(VisitRepository visitRepository) {
     this.visitRepository = visitRepository;
     initializeCacheFromDatabase();
   }
 
+  /**
+   * Initializes the in-memory cache with data from the database.
+   */
   private void initializeCacheFromDatabase() {
     visitRepository.findAll().forEach(visit ->
             counterCache.put(visit.getUrl(), new AtomicLong(visit.getCount()))
@@ -86,6 +95,10 @@ public class VisitCounterServiceImpl implements VisitCounterService {
     return result;
   }
 
+  /**
+   * Scheduled task that periodically saves the in-memory counters to the database.
+   * Runs every 6 seconds.
+   */
   @Scheduled(fixedRate = 6000)
   @Transactional
   public void saveCountersToDatabase() {
@@ -109,6 +122,12 @@ public class VisitCounterServiceImpl implements VisitCounterService {
     visitRepository.saveAll(visitsToSave);
   }
 
+  /**
+   * Determines if a URL should be excluded from visit counting.
+   *
+   * @param url the URL to check
+   * @return true if the URL should be skipped, false otherwise
+   */
   private boolean shouldSkipCounting(String url) {
     return url.startsWith("/api/logs")
             || url.startsWith("/api/visits");

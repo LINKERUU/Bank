@@ -1,12 +1,14 @@
 package com.bank.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
-import java.time.LocalDateTime;
-
+/**
+ * Data Transfer Object for bank transaction.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

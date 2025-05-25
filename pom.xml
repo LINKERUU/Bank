@@ -33,7 +33,6 @@
         <!--suppress UnresolvedMavenProperty -->
         <sonar.login>${SONAR_TOKEN}</sonar.login>
         <java.version>21</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <sonar.coverage.exclusions>
@@ -49,7 +48,6 @@
             **/service/impl/LogServiceImpl.java,
             **/service/impl/VisitCounterServiceImpl.java
         </sonar.coverage.exclusions>
-        <tomcat.version>10.1.27</tomcat.version>
     </properties>
     <dependencies>
 

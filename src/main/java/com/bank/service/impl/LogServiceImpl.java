@@ -2,6 +2,19 @@ package com.bank.service.impl;
 
 import com.bank.model.LogTask;
 import com.bank.service.LogService;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -11,17 +24,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+/**
+ * Implementation of {@link LogService} for handling log processing tasks.
+ */
 @Service
 public class LogServiceImpl implements LogService {
 
@@ -34,7 +39,6 @@ public class LogServiceImpl implements LogService {
   private static final Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4);
 
-  // Статусы задачи
   private enum TaskStatus {
     CREATED("Задача создана"),
     QUEUED("В очереди на выполнение"),
@@ -58,28 +62,22 @@ public class LogServiceImpl implements LogService {
     LogTask task = new LogTask(taskId, TaskStatus.CREATED.name(), date, LocalDateTime.now());
     tasks.put(taskId, task);
 
-    // Планируем выполнение с начальной задержкой
     scheduler.schedule(() -> processTask(taskId, date), INITIAL_DELAY_SECONDS, TimeUnit.SECONDS);
-
     return taskId;
   }
 
   private void processTask(String taskId, String date) {
     try {
       updateStatus(taskId, TaskStatus.QUEUED);
-
-      // Этап 1: Подготовка
       updateStatus(taskId, TaskStatus.PREPARING);
       TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
 
-      // Этап 2: Чтение файла
       updateStatus(taskId, TaskStatus.READING);
       Path logPath = Paths.get(MAIN_LOG_FILE);
       if (!Files.exists(logPath)) {
         throw new IOException("Основной файл логов не найден");
       }
 
-      // Этап 3: Фильтрация
       updateStatus(taskId, TaskStatus.FILTERING);
       TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
       String filteredLogs = Files.lines(logPath)
@@ -90,7 +88,6 @@ public class LogServiceImpl implements LogService {
         throw new IOException("Нет записей за указанную дату");
       }
 
-      // Этап 4: Сохранение
       updateStatus(taskId, TaskStatus.SAVING);
       TimeUnit.SECONDS.sleep(PROCESSING_STEP_DELAY_SECONDS);
       Path outputFile = Paths.get(LOGS_DIRECTORY)

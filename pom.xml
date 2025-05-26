@@ -32,6 +32,9 @@
         <sonar.projectKey>LINKERUU_Bank</sonar.projectKey>
         <!--suppress UnresolvedMavenProperty -->
         <sonar.login>${SONAR_TOKEN}</sonar.login>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <sonar.coverage.exclusions>
             **/aspect/**,
             **/config/**,
@@ -79,8 +82,8 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.6.0</version>
             <scope>runtime</scope>
+            <version>42.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

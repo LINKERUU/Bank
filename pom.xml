@@ -83,7 +83,6 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-            <version>42.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>

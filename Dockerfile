@@ -22,4 +22,5 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-Xmx350m", "-Xms128m", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx450m","-Xms128m" ,"-XX:+UseSerialGC", "-XX:MaxMetaspaceSize=100m" ,"-jar" ,"app.jar"]
+

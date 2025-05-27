@@ -14,7 +14,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
       registry.addMapping("/**")
-              .allowedOrigins("https://frontend-for-bank-production.up.railway.app:3000")
+              .allowedOrigins("https://frontend-for-bank-production.up.railway.app")
               .allowedMethods("*")
               .allowedHeaders("*");
     }

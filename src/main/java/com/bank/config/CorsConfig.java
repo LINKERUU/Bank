@@ -1,21 +1,30 @@
-package com.bank.config;  // Замените на ваш реальный пакет
+package com.bank.config;
 
-import com.bank.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value; // Импортируйте @Value
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Deletes a card by ID.
+ * Configuration class for setting up in-memory caches used throughout the application.
+ * Provides bean definitions for various caches to store frequently accessed data.
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-      registry.addMapping("/**")
-              .allowedOrigins("https://frontend-for-bank-production.up.railway.app")
-              .allowedMethods("*")
-              .allowedHeaders("*");
-    }
+  // Инжектируем значение переменной среды FRONTEND_URL
+  // Если переменная не установлена, будет использоваться значение по умолчанию 'http://localhost:3000'
+  // (замените на порт вашего фронтенда для локальной разработки)
+  @Value("${FRONTEND_URL}")
+  private String frontendUrl;
+
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+            // Используем инжектированное значение
+            .allowedOrigins(frontendUrl)
+            .allowedMethods("GET", "POST", "PUT", "DELETE")
+            .allowedHeaders("Content-Type", "Authorization")
+            .allowCredentials(true);
+  }
 }

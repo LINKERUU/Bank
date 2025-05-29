@@ -15,8 +15,10 @@ public class CorsConfig implements WebMvcConfigurer {
   @Override
   public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**")
-            // Используем инжектированное значение
-            .allowedOrigins("https://frontend-for-bank-production.up.railway.app")
+            .allowedOrigins(
+                    "http://localhost:3000",
+                    "https://frontend-for-bank-production.up.railway.app"
+            )
             .allowedMethods("GET", "POST", "PUT", "DELETE")
             .allowedHeaders("Content-Type", "Authorization")
             .allowCredentials(true);

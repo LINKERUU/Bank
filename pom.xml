@@ -36,7 +36,17 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <sonar.coverage.exclusions>
-            **/*
+            **/aspect/**,
+            **/config/**,
+            **/controller/**,
+            **/exception/**,
+            **/model/**,
+            **/repository/**,
+            **/utils/**,
+            **/BankApplication.java,
+            **/*Test.java,
+            **/service/impl/LogServiceImpl.java,
+            **/service/impl/VisitCounterServiceImpl.java
         </sonar.coverage.exclusions>
     </properties>
     <dependencies>

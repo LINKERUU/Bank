@@ -181,6 +181,7 @@ public class UserServiceImpl implements UserService {
   private UserDto convertToDto(User user) {
     UserDto userDto = new UserDto();
     userDto.setId(user.getId());
+    userDto.setLogin(user.getLogin());
     userDto.setFirstName(user.getFirstName());
     userDto.setLastName(user.getLastName());
     userDto.setEmail(user.getEmail());
@@ -211,6 +212,7 @@ public class UserServiceImpl implements UserService {
   private User convertToEntity(UserDto userDto) {
     User user = new User();
     user.setId(userDto.getId());
+    user.setLogin(userDto.getLogin());
     user.setFirstName(userDto.getFirstName());
     user.setLastName(userDto.getLastName());
     user.setEmail(userDto.getEmail());
@@ -226,6 +228,15 @@ public class UserServiceImpl implements UserService {
     if (user == null) {
       throw new ValidationException("User cannot be null");
     }
+
+    if (user.getLogin() == null || user.getLogin().isBlank()) {
+      throw new ValidationException("Login is required");
+    }
+
+    if (userRepository.existsByLogin(user.getLogin())) {
+      throw new ValidationException("User with this login already exists");
+    }
+
 
     if (user.getEmail() == null || user.getEmail().isBlank()) {
       throw new ValidationException("Email is required");

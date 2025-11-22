@@ -14,10 +14,7 @@ import com.bank.repository.UserRepository;
 import com.bank.service.AccountService;
 import com.bank.utils.InMemoryCache;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +49,21 @@ public class AccountServiceImpl implements AccountService {
     this.cardRepository = cardRepository;
     this.userRepository = userRepository;
     this.accountCache = accountCache;
+  }
+
+  private String generateUniqueAccountNumber() {
+    Random random = new Random();
+    String accountNumber;
+
+    do {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < 20; i++) {
+        sb.append(random.nextInt(10));
+      }
+      accountNumber = sb.toString();
+    } while (accountRepository.existsByAccountNumber(accountNumber));
+
+    return accountNumber;
   }
 
   @Override
@@ -99,6 +111,11 @@ public class AccountServiceImpl implements AccountService {
       throw new ValidationException("The account must be linked to at least one user");
     }
 
+    // Генерация номера счета **до валидации**
+    if (accountDto.getAccountNumber() == null || accountDto.getAccountNumber().isEmpty()) {
+      accountDto.setAccountNumber(generateUniqueAccountNumber());
+    }
+
     validateAccount(accountDto);
 
     Account account = convertToEntity(accountDto);
@@ -118,6 +135,7 @@ public class AccountServiceImpl implements AccountService {
     accountCache.put(savedAccountDto.getId(), savedAccountDto);
     return savedAccountDto;
   }
+
 
   @Override
   @Transactional

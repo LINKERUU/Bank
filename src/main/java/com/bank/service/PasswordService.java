@@ -3,6 +3,8 @@ package com.bank.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+
 /**
  * Service for handling password-related operations, such as hashing and verification.
  */
@@ -26,6 +28,10 @@ public class PasswordService {
    */
   public String hashPassword(String plainPassword) {
     return passwordEncoder.encode(plainPassword);
+  }
+
+  public  boolean matchPassword(String plainPassword, String hashedPassword) {
+    return passwordEncoder.matches(plainPassword, hashedPassword);
   }
 
 }

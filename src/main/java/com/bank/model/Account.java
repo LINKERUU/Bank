@@ -45,7 +45,7 @@ public class Account {
   private Long id;
 
   @NotBlank(message = "Account number cannot be blank")
-  @Size(min = 10, max = 20, message = "Account number must be between 10 and 20 characters")
+  @Size( message = "Account number must be between 10 and 20 characters")
   @Pattern(regexp = "^\\d+$", message = "Account number must contain only digits")
   @Column(name = "account_number", unique = true, nullable = false, length = 20)
   private String accountNumber;

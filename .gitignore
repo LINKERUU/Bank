@@ -7,6 +7,17 @@ target/
 ### STS ###
 .apt_generated
 .classpath
+Bank.iml
+application.log
+log4j2.xml
+mvnw
+mvnw.cmd
+Procfile
+.mvn/wrapper
+.github/workflows
+/logs/
+.gitignore
+.giattributes
 .factorypath
 .project
 .settings

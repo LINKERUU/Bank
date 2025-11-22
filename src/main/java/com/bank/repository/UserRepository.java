@@ -22,8 +22,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * @param id the ID of the user to retrieve
    * @return an {@link Optional} containing the user if found, otherwise empty
    */
-  @EntityGraph(attributePaths = {"accounts"})  // Eagerly loads accounts with the user
+  @EntityGraph(attributePaths = {"accounts"})
+  // Eagerly loads accounts with the user
   Optional<User> findById(Long id);
+
+  boolean existsByLogin(String login);
+
+  Optional<User> findByLogin(String login);
+
+  Optional<User> findByEmail(String email);
 
   /**
    * Checks whether a user with the given email exists in the database.
@@ -43,4 +50,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * @return true if a user with the given phone number exists, false otherwise
    */
   boolean existsByPhone(String phone);
+
 }

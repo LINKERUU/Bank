@@ -1,3 +1,0 @@
-2025-05-14T20:00:59.750+03:00  INFO 19840 --- [Bank] [http-nio-8080-exec-1] com.bank.service.impl.LogServiceImpl     : Создана новая задача f0b3c1d1-3187-4e4f-86ff-f6382074353e для даты 2025-04-14
-2025-05-14T20:02:00.460+03:00  INFO 15484 --- [Bank] [http-nio-8080-exec-1] com.bank.service.impl.LogServiceImpl     : Создана новая задача 18218550-7fde-4369-95b7-620ff5290e37 для даты 2025-04-14
-2025-05-14T20:03:36.365+03:00  INFO 21396 --- [Bank] [http-nio-8080-exec-1] com.bank.service.impl.LogServiceImpl     : Создана новая задача b3181fae-4056-474c-8ec4-28d25b7c9e3c для даты 2025-04-14
